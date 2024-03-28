@@ -21,4 +21,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
+    public void startGame ( View view){}
+    GameView gameView = new GameView(this);
+    setContentView(gameView);
 }
