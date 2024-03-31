@@ -8,6 +8,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -21,4 +22,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
+    public void startGame ( View view){}
+    GameView gameView = new GameView(this);
+    setContentView(gameView);
 }
