@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -24,7 +25,9 @@ public class GameView extends View {
 
     Bitmap home_bkgrd_platform, car, scaledBg;
     static int dWidth, dHeight;
-    ArrayList<PurpleFish> purpleFish, robotFish, shark;
+    ArrayList<PurpleFish> purpleFish;
+    //ArrayList<RobotFish> robotFish;
+    //ArrayList<Shark> shark;
     Handler handler;
     Runnable runnable;
     static int carWidth, carHeight;
@@ -39,7 +42,11 @@ public class GameView extends View {
         this.context = context;
 
         home_bkgrd_platform = BitmapFactory.decodeResource(getResources(), R.drawable.home_bkgrd_platform);
+        Log.d("GameView", "Background loaded");
+
         car = BitmapFactory.decodeResource(getResources(), R.drawable.original_car);
+        Log.d("GameView", "car loaded");
+
 
         Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -48,21 +55,29 @@ public class GameView extends View {
         dHeight = size.y;
         scaledBg = Bitmap.createScaledBitmap(home_bkgrd_platform, dWidth, dHeight, true);
 
-//        purpleFish = new ArrayList<>();
-//        robotFish = new ArrayList<>();
-//        shark = new ArrayList<>();
-//        initializeFish();
-//
-//        for (int i = 0; i < 3; i++) {
-//            PurpleFish apurpleFish = new PurpleFish(context);
-//            purpleFish.add(apurpleFish);
+        purpleFish = new ArrayList<>();
+        //robotFish = new ArrayList<RobotFish>();
+        //shark = new ArrayList<Shark>();
+        initializeFish();
+
+        for (int i = 0; i < 3; i++) {
+            PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
+            purpleFish.add(aPurpleFish);
 //            RobotFish arobotFish = new RobotFish(context);
 //            robotFish.add(arobotFish);
 //            Shark ashark = new Shark(context);
 //            shark.add(ashark);
-//        }
-        handler = new Handler();
-        runnable = this::invalidate; // Replace anonymous Runnable with lambda expression
+        }
+        handler = new Handler(Looper.getMainLooper());
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                invalidate(); // Triggers onDraw
+                handler.postDelayed(this, 30); // Adjust FRAME_DELAY as needed
+            }
+        };
+        handler.post(runnable); // Start the drawing loop
+
 
         // Resize the car as specified
         float aspectRatio = (float) car.getHeight() / (float) car.getWidth();
@@ -92,57 +107,87 @@ public class GameView extends View {
     private Bitmap scaleBitmap(Bitmap bitmap, int width, int height) {
         return bitmap != null ? Bitmap.createScaledBitmap(bitmap, width, height, true) : null;
     }
-//
-//    // Initialization of Fish Objects
-//    private void initializeFish() {
-//        for (int i = 0; i < 3; i++) {
-//            PurpleFish apurpleFish = new PurpleFish(context);
-//            purpleFish.add(apurpleFish);
+
+    // Initialization of Fish Objects
+    private void initializeFish() {
+        for (int i = 0; i < 3; i++) {
+            PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
+            purpleFish.add(aPurpleFish);
+            Log.d("GameView", "PurpleFish added");
 //            RobotFish arobotFish = new RobotFish(context);
 //            robotFish.add(arobotFish);
+//            Log.d("GameView", "robotfish added");
 //            Shark ashark = new Shark(context);
 //            shark.add(ashark);
-//        }
-//    }
+//            Log.d("GameView", "shark added");
+        }
+    }
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
+        Log.d("GameView", "onDraw called");
 
         if (scaledBg.getWidth() != getWidth() || scaledBg.getHeight() != getHeight()) {
             scaledBg = Bitmap.createScaledBitmap(home_bkgrd_platform, getWidth(), getHeight(), true);
         }
 
         canvas.drawBitmap(scaledBg, 0, 0, null);
+
+
+        Log.d("GameView", "PurpleFish size: " + purpleFish.size());
+//        Log.d("GameView", "RobotFish size: " + robotFish.size());
+//        Log.d("GameView", "Shark size: " + shark.size());
+
+        //for (int i = 0; i < Math.min(Math.min(purpleFish.size(), robotFish.size()), shark.size()); i++) {
 //        for (int i = 0; i < purpleFish.size(); i++) {
-//            canvas.drawBitmap(purpleFish.get(i).getBitmap(), purpleFish.get(i).purpleFishX, purpleFish.get(i).purpleFishY, null);
+////            Log.d("GameView", "onDraw:drawing fishes ");
+//            // Draw and animate purpleFish
+//            purpleFish.get(i).update();
+//            canvas.drawBitmap(purpleFish.get(i).getBitmap(), purpleFish.get(i).getX(), purpleFish.get(i).getY(), null);
 //            purpleFish.get(i).fishFrame++;
 //            if (purpleFish.get(i).fishFrame > 4) {
-//                purpleFish.get(i).fishFrame = 0;
+//                 purpleFish.get(i).fishFrame = 0;
 //            }
-//            purpleFish.get(i).purpleFishX -= purpleFish.get(i).velocity;
-//            if (purpleFish.get(i).purpleFishX < -purpleFish.get(i).getWidth()) {
-//                purpleFish.get(i).resetPosition();
+//           int newPurpleFishX = purpleFish.get(i).getX() + purpleFish.get(i).velocity;
+//           purpleFish.get(i).setX(newPurpleFishX);
+//
+//            if (purpleFish.get(i).getX() < -purpleFish.get(i).getWidth()) {
+//                purpleFish.get(i).resetPosition(dWidth,dHeight);
 //            }
-//            canvas.drawBitmap(robotFish.get(i).getBitmap(), robotFish.get(i).purpleFishX, robotFish.get(i).purpleFishY, null);
-//            robotFish.get(i).fishFrame++;
-//            if (robotFish.get(i).fishFrame > 4) {
-//                robotFish.get(i).fishFrame = 0;
-//            }
-//            robotFish.get(i).fishFrame += robotFish.get(i).velocity;
-//            if (robotFish.get(i).purpleFishX > (dWidth + robotFish.get(i).getWidth())) {
-//                robotFish.get(i).resetPosition();
-//            }
-//            canvas.drawBitmap(shark.get(i).getBitmap(), shark.get(i).purpleFishX, shark.get(i).purpleFishY, null);
-//            shark.get(i).fishFrame++;
-//            if (shark.get(i).fishFrame > 4) {
-//                shark.get(i).fishFrame = 0;
-//            }
-//            shark.get(i).fishFrame += shark.get(i).velocity;
-//            if (shark.get(i).purpleFishX > (dWidth + shark.get(i).getWidth())) {
-//                shark.get(i).resetPosition();
-//            }
+//
+////    // Draw and animate robotFish (fixed to use correct x-coordinate and velocity)
+////    canvas.drawBitmap(robotFish.get(i).getBitmap(), robotFish.get(i).getX(), robotFish.get(i).getY(), null);
+////    robotFish.get(i).fishFrame++;
+////    if (robotFish.get(i).fishFrame > 4) {
+////        robotFish.get(i).fishFrame = 0;
+////    }
+////           int newRobotFishX = robotFish.get(i).getX() + robotFish.get(i).velocity;
+////           robotFish.get(i).setX(newRobotFishX);
+////           // Assuming robotFish move left to right
+////    if (robotFish.get(i).getX()> (dWidth + robotFish.get(i).getWidth())) {
+////        robotFish.get(i).resetPosition();
+////    }
+////
+////    // Draw and animate shark (fixed to use correct x-coordinate and velocity)
+////    canvas.drawBitmap(shark.get(i).getBitmap(), shark.get(i).getX(), shark.get(i).getY(), null);
+////    shark.get(i).fishFrame++;
+////    if (shark.get(i).fishFrame > 4) {
+////        shark.get(i).fishFrame = 0;
+////    }
+////           int newSharkX = shark.get(i).getX() + shark.get(i).velocity;
+////           shark.get(i).setX(newSharkX);
+////    if (shark.get(i).getX() > (dWidth + shark.get(i).getWidth())) {
+////        shark.get(i).resetPosition();
+////    }
 //        }
+//        invalidate();
+        for (PurpleFish fish : purpleFish) {
+            fish.update();  // Update position and check for looping
+            canvas.drawBitmap(fish.getBitmap(), fish.getX(), fish.getY(), null); // Draw fish
+        }
+        invalidate(); // Keep the loop going
+
 
         int carX = dWidth / 2 - carWidth / 2;
         int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07); // Adjust this factor to move the car down

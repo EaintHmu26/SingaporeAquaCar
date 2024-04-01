@@ -8,7 +8,10 @@ import java.util.Random;
 public class Shark {
 
     private final Bitmap[] shark = new Bitmap[5];
-    private int fishX, fishY, velocity, fishFrame;
+    private int fishX;
+    private int fishY;
+    protected int velocity;
+    protected int fishFrame;
     private final Random random;
 
     public Shark(Context context) {
@@ -35,6 +38,13 @@ public class Shark {
 
     public int getY() {
         return fishY;
+    }
+
+    public void setX(int x) {
+        this.fishX = x;
+    }
+    public void setY(int x) {
+        this.fishX = x;
     }
 
     public void update() {
