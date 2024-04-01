@@ -7,9 +7,10 @@ import java.util.Random;
 
 public class PurpleFish {
 
-    private Bitmap[] purpleFish = new Bitmap[5];
+    private Bitmap[] purpleFish = new Bitmap[10];
     private int frameDelayCounter = 0; // Counter to control frame update delay
-    private final int FRAME_UPDATE_DELAY = 20; // Number of updates to wait before changing frame, adjust for smoothness
+    private final int distancePerFrame = 15; // Distance for each frame change
+    private int initialX;
     private int fishX;
     private int fishY;
     protected int velocity;
@@ -42,11 +43,11 @@ public class PurpleFish {
 
     // Adjust the resetPosition method to accept screen dimensions
     public void resetPosition(int screenWidth, int screenHeight) {
-        // Correctly start just off the right edge of the screen
-        fishX = -random.nextInt(100) - getWidth();  // No need for getWidth() here
-        fishY = random.nextInt((int) (screenHeight * 0.8));
-        velocity = 2 + random.nextInt(3);  // Ensure this is properly set to move leftward
-        fishFrame = 0;
+        initialX = -random.nextInt(100) - getWidth();
+        fishX = initialX; // Set fishX to initialX
+        fishY = random.nextInt(screenHeight);
+        velocity = 2 + random.nextInt(3); // Adjust for a slower speed
+        fishFrame = 0; // Start with the first frame
     }
 
 
@@ -86,15 +87,10 @@ public class PurpleFish {
         if (fishX > screenWidth) { // Check if the fish is off-screen to the right
             resetPosition(screenWidth, screenHeight);
         }
-        frameDelayCounter++;
-        if (frameDelayCounter >= FRAME_UPDATE_DELAY) {
-            fishFrame++;
-            frameDelayCounter = 0; // Reset the delay counter
-        }
+        int distanceMoved = fishX - initialX;
+        fishFrame = (distanceMoved / distancePerFrame) % purpleFish.length;
 
-        if (fishFrame >= purpleFish.length) {
-            fishFrame = 0;
-        }
+
     }
 
 

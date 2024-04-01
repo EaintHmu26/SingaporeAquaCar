@@ -27,7 +27,8 @@ public class GameView extends View {
     static int dWidth, dHeight;
     ArrayList<PurpleFish> purpleFish;
     //ArrayList<RobotFish> robotFish;
-    //ArrayList<Shark> shark;
+
+    ArrayList<Shark> shark;
     Handler handler;
     Runnable runnable;
     static int carWidth, carHeight;
@@ -57,7 +58,7 @@ public class GameView extends View {
 
         purpleFish = new ArrayList<>();
         //robotFish = new ArrayList<RobotFish>();
-        //shark = new ArrayList<Shark>();
+        shark = new ArrayList<Shark>();
         initializeFish();
 
         for (int i = 0; i < 3; i++) {
@@ -65,9 +66,10 @@ public class GameView extends View {
             purpleFish.add(aPurpleFish);
 //            RobotFish arobotFish = new RobotFish(context);
 //            robotFish.add(arobotFish);
-//            Shark ashark = new Shark(context);
-//            shark.add(ashark);
         }
+        //i only want to add one shark
+        Shark ashark = new Shark(context, dWidth, dHeight);
+        shark.add(ashark);
         handler = new Handler(Looper.getMainLooper());
         runnable = new Runnable() {
             @Override
@@ -114,13 +116,13 @@ public class GameView extends View {
             PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
             purpleFish.add(aPurpleFish);
             Log.d("GameView", "PurpleFish added");
-//            RobotFish arobotFish = new RobotFish(context);
-//            robotFish.add(arobotFish);
-//            Log.d("GameView", "robotfish added");
-//            Shark ashark = new Shark(context);
-//            shark.add(ashark);
-//            Log.d("GameView", "shark added");
+
         }
+        //i just want to add one shark
+        Shark ashark = new Shark(context, dWidth, dHeight);
+        shark.add(ashark);
+        Log.d("GameView", "shark added");
+
     }
 
     @Override
@@ -137,7 +139,7 @@ public class GameView extends View {
 
         Log.d("GameView", "PurpleFish size: " + purpleFish.size());
 //        Log.d("GameView", "RobotFish size: " + robotFish.size());
-//        Log.d("GameView", "Shark size: " + shark.size());
+        Log.d("GameView", "Shark size: " + shark.size());
 
         //for (int i = 0; i < Math.min(Math.min(purpleFish.size(), robotFish.size()), shark.size()); i++) {
 //        for (int i = 0; i < purpleFish.size(); i++) {
@@ -185,6 +187,10 @@ public class GameView extends View {
         for (PurpleFish fish : purpleFish) {
             fish.update();  // Update position and check for looping
             canvas.drawBitmap(fish.getBitmap(), fish.getX(), fish.getY(), null); // Draw fish
+        }
+        for (Shark sharks : shark) {
+            sharks.update();  // Update position and check for looping
+            canvas.drawBitmap(sharks.getBitmap(), sharks.getX(), sharks.getY(), null); // Draw fish
         }
         invalidate(); // Keep the loop going
 
