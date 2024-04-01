@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class PurpleFish {
 
-    private Bitmap[] purpleFish = new Bitmap[10];
+    private Bitmap[] purpleFish = new Bitmap[5];
     private int frameDelayCounter = 0; // Counter to control frame update delay
     private final int distancePerFrame = 15; // Distance for each frame change
     private int initialX;
