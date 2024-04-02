@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SingaporeAquaCars</string>
+    <string name="channel_name">AquaCarsNotificationChannel</string>
+    <string name="channel_description">Notification channel for SingaporeAquaCars</string>
 </resources>
