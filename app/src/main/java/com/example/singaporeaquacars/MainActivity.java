@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements Clicker.ClickerUp
             if (!isChangingConfigurations()) {
                 Intent serviceIntent = new Intent(this, ReminderService.class);
                 startService(serviceIntent);
+            }
         }
   
         private void createNotificationChannel() {
@@ -166,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements Clicker.ClickerUp
               NotificationManager notificationManager = getSystemService(NotificationManager.class);
               notificationManager.createNotificationChannel(channel);
           }
+    public void startGame (GameView view){
+
     }
-    public void startGame (GameView view){}
 }
