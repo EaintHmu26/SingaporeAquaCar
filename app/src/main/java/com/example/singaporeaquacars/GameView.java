@@ -27,7 +27,6 @@ public class GameView extends View {
     static int dWidth, dHeight;
     ArrayList<PurpleFish> purpleFish;
     //ArrayList<RobotFish> robotFish;
-
     ArrayList<Shark> shark;
     Handler handler;
     Runnable runnable;
@@ -41,6 +40,7 @@ public class GameView extends View {
     float plusOneX = 0, plusOneY = 0; //position of +1
     int plusOneAlpha = 255; //fading effect
     Paint plusOnePaint;
+    private OnCoinCountChangeListener coinCountChangeListener;
 
     public GameView(Context context){
         super(context);
@@ -68,8 +68,6 @@ public class GameView extends View {
         for (int i = 0; i < 3; i++) {
             PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
             purpleFish.add(aPurpleFish);
-//            RobotFish arobotFish = new RobotFish(context);
-//            robotFish.add(arobotFish);
         }
         //i only want to add one shark
         Shark ashark = new Shark(context, dWidth, dHeight);
@@ -83,7 +81,6 @@ public class GameView extends View {
             }
         };
         handler.post(runnable); // Start the drawing loop
-
 
         // Resize the car as specified
         float aspectRatio = (float) car.getHeight() / (float) car.getWidth();
@@ -103,6 +100,26 @@ public class GameView extends View {
         plusOnePaint.setColor(Color.YELLOW);
         plusOnePaint.setTextSize(TEXT_SIZE * 1.5f);
         plusOnePaint.setAntiAlias(true);
+    }
+
+    public interface OnCoinCountChangeListener {
+        void onCoinCountChanged(int newCoinCount);
+    }
+
+    public void setOnCoinCountChangeListener(OnCoinCountChangeListener listener) {
+        this.coinCountChangeListener = listener;
+    }
+
+    public void saveCoinCount() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("coinCount", coinCount);
+        editor.apply();
+    }
+
+    public void setCoinCount(int coinCount) {
+        this.coinCount = coinCount;
+        saveCoinCount(); // Save the updated coin count
+        postInvalidate(); // Redraw the view with the updated coin count
     }
 
     // Load bitmap with error checking
@@ -216,17 +233,22 @@ public class GameView extends View {
             // Check if the touch is within the bounds of the car image
             if (touchX >= carX && touchX < (carX + carWidth) && touchY >= carY && touchY < (carY + carHeight)) {
                 coinCount++; // Increment coin count only if the car is touched
+                saveCoinCount();
                 showPlusOne = true;
                 plusOneX = carX + carWidth / 2;
                 plusOneY = carY;
                 plusOneAlpha = 255;
                 startPlusOneAnimation();
                 invalidate(); // Redraw to show the updated coin count
+                if(coinCountChangeListener != null) {
+                    coinCountChangeListener.onCoinCountChanged(coinCount);
+                }
             }
         }
         return true;
     }
 }
+
 
 
 
