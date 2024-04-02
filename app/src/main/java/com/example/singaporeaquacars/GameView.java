@@ -37,6 +37,10 @@ public class GameView extends View {
     Paint coinCountPaint;
     final int TEXT_SIZE = 60;
     SharedPreferences prefs;
+    boolean showPlusOne = false;
+    float plusOneX = 0, plusOneY = 0; //position of +1
+    int plusOneAlpha = 255; //fading effect
+    Paint plusOnePaint;
 
     public GameView(Context context){
         super(context);
@@ -94,6 +98,11 @@ public class GameView extends View {
 
         prefs = context.getSharedPreferences("gameData", Context.MODE_PRIVATE);
         coinCount = prefs.getInt("coinCount", 0);
+
+        plusOnePaint = new Paint();
+        plusOnePaint.setColor(Color.YELLOW);
+        plusOnePaint.setTextSize(TEXT_SIZE * 1.5f);
+        plusOnePaint.setAntiAlias(true);
     }
 
     // Load bitmap with error checking
@@ -125,6 +134,34 @@ public class GameView extends View {
 
     }
 
+    private void startPlusOneAnimation() {
+        final int animationDuration = 500; // Animation duration in milliseconds
+        final int frameRate = 30; // How often to update the animation
+        final float deltaY = -30; // How much the text moves up
+        final Handler animationHandler = new Handler(Looper.getMainLooper());
+        final long startTime = System.currentTimeMillis();
+
+        Runnable animationRunnable = new Runnable() {
+            @Override
+            public void run() {
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                float fraction = elapsedTime / (float) animationDuration;
+                if (fraction <= 1.0) {
+                    // Update position and alpha
+                    plusOneY += deltaY * fraction;
+                    plusOneAlpha = 255 - (int)(255 * fraction);
+                    plusOnePaint.setAlpha(plusOneAlpha);
+                    invalidate(); // Redraw to show animation progress
+                    animationHandler.postDelayed(this, frameRate);
+                } else {
+                    // Animation end
+                    showPlusOne = false;
+                }
+            }
+        };
+        animationHandler.post(animationRunnable);
+    }
+
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
@@ -141,49 +178,6 @@ public class GameView extends View {
 //        Log.d("GameView", "RobotFish size: " + robotFish.size());
         Log.d("GameView", "Shark size: " + shark.size());
 
-        //for (int i = 0; i < Math.min(Math.min(purpleFish.size(), robotFish.size()), shark.size()); i++) {
-//        for (int i = 0; i < purpleFish.size(); i++) {
-////            Log.d("GameView", "onDraw:drawing fishes ");
-//            // Draw and animate purpleFish
-//            purpleFish.get(i).update();
-//            canvas.drawBitmap(purpleFish.get(i).getBitmap(), purpleFish.get(i).getX(), purpleFish.get(i).getY(), null);
-//            purpleFish.get(i).fishFrame++;
-//            if (purpleFish.get(i).fishFrame > 4) {
-//                 purpleFish.get(i).fishFrame = 0;
-//            }
-//           int newPurpleFishX = purpleFish.get(i).getX() + purpleFish.get(i).velocity;
-//           purpleFish.get(i).setX(newPurpleFishX);
-//
-//            if (purpleFish.get(i).getX() < -purpleFish.get(i).getWidth()) {
-//                purpleFish.get(i).resetPosition(dWidth,dHeight);
-//            }
-//
-////    // Draw and animate robotFish (fixed to use correct x-coordinate and velocity)
-////    canvas.drawBitmap(robotFish.get(i).getBitmap(), robotFish.get(i).getX(), robotFish.get(i).getY(), null);
-////    robotFish.get(i).fishFrame++;
-////    if (robotFish.get(i).fishFrame > 4) {
-////        robotFish.get(i).fishFrame = 0;
-////    }
-////           int newRobotFishX = robotFish.get(i).getX() + robotFish.get(i).velocity;
-////           robotFish.get(i).setX(newRobotFishX);
-////           // Assuming robotFish move left to right
-////    if (robotFish.get(i).getX()> (dWidth + robotFish.get(i).getWidth())) {
-////        robotFish.get(i).resetPosition();
-////    }
-////
-////    // Draw and animate shark (fixed to use correct x-coordinate and velocity)
-////    canvas.drawBitmap(shark.get(i).getBitmap(), shark.get(i).getX(), shark.get(i).getY(), null);
-////    shark.get(i).fishFrame++;
-////    if (shark.get(i).fishFrame > 4) {
-////        shark.get(i).fishFrame = 0;
-////    }
-////           int newSharkX = shark.get(i).getX() + shark.get(i).velocity;
-////           shark.get(i).setX(newSharkX);
-////    if (shark.get(i).getX() > (dWidth + shark.get(i).getWidth())) {
-////        shark.get(i).resetPosition();
-////    }
-//        }
-//        invalidate();
         for (PurpleFish fish : purpleFish) {
             fish.update();  // Update position and check for looping
             canvas.drawBitmap(fish.getBitmap(), fish.getX(), fish.getY(), null); // Draw fish
@@ -198,6 +192,10 @@ public class GameView extends View {
         int carX = dWidth / 2 - carWidth / 2;
         int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07); // Adjust this factor to move the car down
         canvas.drawBitmap(car, carX, carY, null);
+
+        if (showPlusOne) {
+            canvas.drawText("+1", plusOneX, plusOneY, plusOnePaint);
+        }
 
         // Display the coin count
         canvas.drawText("Coins: $" + coinCount, 20, TEXT_SIZE + 20, coinCountPaint);
@@ -218,6 +216,11 @@ public class GameView extends View {
             // Check if the touch is within the bounds of the car image
             if (touchX >= carX && touchX < (carX + carWidth) && touchY >= carY && touchY < (carY + carHeight)) {
                 coinCount++; // Increment coin count only if the car is touched
+                showPlusOne = true;
+                plusOneX = carX + carWidth / 2;
+                plusOneY = carY;
+                plusOneAlpha = 255;
+                startPlusOneAnimation();
                 invalidate(); // Redraw to show the updated coin count
             }
         }
