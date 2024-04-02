@@ -21,6 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Store Activity -->
+        <activity
+            android:name=".StoreActivity"
+            android:exported="true">
+            <!-- No intent-filter needed unless you want this Activity to be an entry point -->
+        </activity>
 
         <service
             android:name=".ReminderService"
