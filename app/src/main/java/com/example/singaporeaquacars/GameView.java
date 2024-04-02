@@ -3,6 +3,7 @@ package com.example.singaporeaquacars;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,6 +26,9 @@ public class GameView extends View {
 
     Bitmap home_bkgrd_platform, car, scaledBg;
     static int dWidth, dHeight;
+
+    Bitmap storeIcon;
+    static int storeIconWidth, storeIconHeight;
     ArrayList<PurpleFish> purpleFish;
     //ArrayList<RobotFish> robotFish;
 
@@ -47,6 +51,15 @@ public class GameView extends View {
 
         car = BitmapFactory.decodeResource(getResources(), R.drawable.original_car);
         Log.d("GameView", "car loaded");
+
+        storeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.store);
+
+        // Scale down the store icon
+        int iconWidth = 500; // set the width you want for the icon
+        float aspectRatio1 = (float) storeIcon.getHeight() / (float) storeIcon.getWidth();
+        int iconHeight = (int) (iconWidth * aspectRatio1);
+        storeIcon = Bitmap.createScaledBitmap(storeIcon, iconWidth, iconHeight, false);
+
 
 
         Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
@@ -199,6 +212,11 @@ public class GameView extends View {
         int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07); // Adjust this factor to move the car down
         canvas.drawBitmap(car, carX, carY, null);
 
+        // Draw the store icon at a specific position, e.g., top-right corner
+        int iconX = dWidth - storeIcon.getWidth() - 30; // 50 is a margin from the right edge
+        int iconY = 30; // 50 is a margin from the top edge
+        canvas.drawBitmap(storeIcon, iconX, iconY, null);
+
         // Display the coin count
         canvas.drawText("Coins: $" + coinCount, 20, TEXT_SIZE + 20, coinCountPaint);
     }
@@ -211,6 +229,18 @@ public class GameView extends View {
             int touchX = (int) event.getX();
             int touchY = (int) event.getY();
 
+            // Check if the store icon is clicked
+            int storeIconX = dWidth - storeIcon.getWidth() - 30; // 30px margin from the right edge
+            int storeIconY = 30; // 30px margin from the top edge
+            int storeIconEndX = storeIconX + storeIcon.getWidth();
+            int storeIconEndY = storeIconY + storeIcon.getHeight();
+
+            if (touchX >= storeIconX && touchX <= storeIconEndX && touchY >= storeIconY && touchY <= storeIconEndY) {
+                // The store icon was clicked
+                openStore();
+                return true;
+            }
+
             // Calculate the car's position
             int carX = dWidth / 2 - carWidth / 2;
             // Adjust the carY variable to match the Y position where the car image actually starts
@@ -222,6 +252,12 @@ public class GameView extends View {
             }
         }
         return true;
+    }
+
+    private void openStore() {
+        // Intent to start StoreActivity
+        Intent intent = new Intent(context, StoreActivity.class);
+        context.startActivity(intent);
     }
 }
 
