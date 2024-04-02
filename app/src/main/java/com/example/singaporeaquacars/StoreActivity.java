@@ -176,7 +176,7 @@ public class StoreActivity extends Activity {
                 public void onClick(View v) {
                     // Handle autocoin button click here
                     // Call the method specific to autocoin button
-                    clicker.activateAutoClickUpgrade(StoreActivity.this);
+                    clicker.deductAutoClickerCoin(StoreActivity.this);
                     System.out.println("Calling the autoclicker upgrade function");
 
                     // Update coins display

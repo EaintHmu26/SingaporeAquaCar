@@ -18,7 +18,8 @@ public class Clicker {
     public static final int AUTO_CLICK_INTERVAL = 15000; // 15 seconds
     private static final int AUTO_CLICK_DURATION = 30000; // 30 seconds
 
-    private boolean autoClickUpgradeActive = false;
+    private boolean continuousClickActive = false;
+    private Runnable continuousClickRunnable;
     private ClickerUpdateListener updateListener;
 
     public Clicker() {
@@ -41,8 +42,17 @@ public class Clicker {
                 autoClickHandler.postDelayed(this, AUTO_CLICK_INTERVAL);
             }
         };
+        continuousClickRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (continuousClickActive) {
+                    handleClick(); // This method increases the coins
 
-
+                    // Reschedule the continuous click every second
+                    autoClickHandler.postDelayed(this, 1000); // 1 second for continuous click
+                }
+            }
+        };
     }
 
     public void handleClick() {
@@ -72,48 +82,84 @@ public class Clicker {
     }
 
     public void startAutoClick() {
-        if (!autoClickUpgradeActive) { // Check if not already active
-            autoClickUpgradeActive = true; // Mark as active
-            autoClickHandler.postDelayed(autoClickRunnable, AUTO_CLICK_INTERVAL);
-        }
+        autoClickHandler.postDelayed(autoClickRunnable, AUTO_CLICK_INTERVAL);
     }
 
     public void stopAutoClick() {
-        if (autoClickUpgradeActive) { // Check if it's active
-            autoClickHandler.removeCallbacks(autoClickRunnable);
-            autoClickUpgradeActive = false; // Reset state
+        autoClickHandler.removeCallbacks(autoClickRunnable);
+    }
+
+    public interface ClickerUpdateListener {
+        void onUpdateCoins(int totalCoins);
+    }
+
+    public void activateContinuousAutoClickUpgrade(Context context) {
+        if (!continuousClickActive) {
+            System.out.println("starting autoclicker");
+            continuousClickActive = true;
+            autoClickHandler.postDelayed(continuousClickRunnable, 1000); // Start immediately
+
+            // Schedule deactivation of continuous clicking after 30 seconds
+            autoClickHandler.postDelayed(() -> {
+                stopContinuousClicking();
+            }, AUTO_CLICK_DURATION);
         }
     }
 
-    public void activateAutoClickUpgrade(Context context) {
+    public void deductAutoClickerCoin(Context context){
         int upgradeCost = 50;
         if (totalCoinsEarned >= upgradeCost) {
             // Deduct the upgrade cost from the total coins earned
             totalCoinsEarned -= upgradeCost;
 
             // Activate auto-click upgrade for 30 seconds
-            autoClickUpgradeActive = true;
-            autoClickHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    deactivateAutoClickUpgrade();
-                }
-            }, AUTO_CLICK_DURATION);
         } else {
             // Display a message or handle insufficient funds
             Toast.makeText(context, "Insufficient coins to upgrade", Toast.LENGTH_SHORT).show();
         }
     }
+//    public void activateAutoClickUpgrade(Context context) {
+//        System.out.println("starting autoclicker");
+//
+//        final int incrementInterval = 1000; // Increment every second, for example
+//        autoClickHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                // Check if auto-clicker is still active
+//                if (autoClickUpgradeActive) {
+//                    // Increase coins
+//                    totalCoinsEarned += 1; // Increase by 1 or your desired amount
+//
+//                    // Notify the listener
+//                    if (updateListener != null) {
+//                        updateListener.onUpdateCoins(totalCoinsEarned);
+//                    }
+//
+//                    // Schedule the next increment
+//                    autoClickHandler.postDelayed(this, incrementInterval);
+//                }
+//            }
+//        }, incrementInterval);
+//
+//        autoClickHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                deactivateAutoClickUpgrade();
+//            }
+//        }, AUTO_CLICK_DURATION);
+//
+//    }
 
-    public interface ClickerUpdateListener {
-        void onUpdateCoins(int totalCoins);
-    }
-    public void deactivateAutoClickUpgrade() {
-        autoClickUpgradeActive = false;
+    public void stopContinuousClicking() {
+        if (continuousClickActive) {
+            System.out.println("Stopping autoclicker upgrade");
+            autoClickHandler.removeCallbacks(continuousClickRunnable);
+            continuousClickActive = false;
+        }
     }
 
-    public boolean isAutoClickUpgradeActive() {
-        return autoClickUpgradeActive;
+    public boolean isContinuousClickActive() {
+        return continuousClickActive;
     }
 
     // Getter and setter methods for currentCoinsPerClick and totalCoinsEarned
@@ -143,7 +189,7 @@ public class Clicker {
         ContentValues values = new ContentValues();
         values.put("totalCoinsEarned", totalCoinsEarned);
         values.put("currentCoinsPerClick", currentCoinsPerClick);
-        values.put("autoClickUpgradeActive", autoClickUpgradeActive ? 1 : 0);
+        values.put("autoClickUpgradeActive", continuousClickActive ? 1 : 0);
         Log.d("Clicker", "Saving to DB: Total Coins: " + totalCoinsEarned + ", Coins Per Click: " + currentCoinsPerClick);
         // Rest of the save code...
 
@@ -188,8 +234,8 @@ public class Clicker {
             }
 
             if (autoClickUpgradeActiveIndex != -1) {
-                autoClickUpgradeActive = cursor.getInt(autoClickUpgradeActiveIndex) == 1;
-                Log.d("Clicker", "Data loaded successfully from DB:  autoclick upgrade active ? : " + autoClickUpgradeActiveIndex + " " + autoClickUpgradeActive);
+                continuousClickActive = cursor.getInt(autoClickUpgradeActiveIndex) == 1;
+                Log.d("Clicker", "Data loaded successfully from DB:  autoclick upgrade active ? : " + autoClickUpgradeActiveIndex + " " + continuousClickActive);
             }
         }
         cursor.close();

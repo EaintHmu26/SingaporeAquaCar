@@ -7,6 +7,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Build;
 import android.provider.Settings;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements Clicker.ClickerUp
     protected void onResume() {
         super.onResume();
         clicker.loadGameProgressFromDB(this); // Refresh game progress
+        clicker.startAutoClick();
         updateCoinsTextView(clicker.getTotalCoinsEarned());
         // Cancel any set alarms as the user is back
         Intent notificationIntent = new Intent(this, ReminderBroadcast.class);
@@ -113,6 +115,18 @@ public class MainActivity extends AppCompatActivity implements Clicker.ClickerUp
             intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
             intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
             startActivity(intent);
+        }
+
+        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+        boolean autoCoinPurchased = prefs.getBoolean("AutoCoinPurchased", false);
+
+        if (autoCoinPurchased) {
+            // Activate auto-clicker if not already active
+            clicker.activateContinuousAutoClickUpgrade(this);
+            // Reset the flag
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("AutoCoinPurchased", false);
+            editor.apply();
         }
     }
     @Override
