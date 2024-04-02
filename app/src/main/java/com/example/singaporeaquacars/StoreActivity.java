@@ -109,49 +109,6 @@ public class StoreActivity extends Activity {
         // Add the back button dynamically
         addButtonToLayout(mainLayout);
     }
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-//        clicker = new Clicker();
-//
-//        // The main layout for the activity
-//        LinearLayout mainLayout = new LinearLayout(this);
-//        mainLayout.setOrientation(LinearLayout.VERTICAL);
-//        mainLayout.setGravity(Gravity.CENTER_HORIZONTAL);
-//
-//        mainLayout.setBackgroundResource(R.drawable.store_background);
-//
-//
-//        // Define padding and imageSize
-//        int padding = (int) (16 * getResources().getDisplayMetrics().density);
-//        int imageSize = (int) (80 * getResources().getDisplayMetrics().density); // smaller size for icons
-//
-//        // Add all upgrade sections to the mainLayout
-//        mainLayout.addView(createUpgradeSection(
-//                R.drawable.x2_coin_icon, "x2 Coin - $30", imageSize, padding));
-//        mainLayout.addView(createUpgradeSection(
-//                R.drawable.autocoin_icon, "Auto Coin - $50", imageSize, padding));
-//        mainLayout.addView(createUpgradeSection(
-//                R.drawable.car_wings_cheapest,"Wings 1 - $1000", imageSize, padding));
-//        mainLayout.addView(createUpgradeSection(
-//                R.drawable.car_wings_middle,"Wings 2 - $1500", imageSize, padding));
-//        mainLayout.addView(createUpgradeSection(
-//                R.drawable.car_wings_ex, "Wings 3 - $2000", imageSize, padding));
-//
-//        // Now create the ScrollView and add the mainLayout to it
-//        ScrollView scrollView = new ScrollView(this);
-//        scrollView.addView(mainLayout);
-//
-//
-//
-//        // Finally, set the main layout as the content view
-//        setContentView(scrollView);
-//
-//        // Add the back button dynamically
-//        addButtonToLayout(mainLayout);
-//    }
 
     private void addButtonToLayout(LinearLayout layout) {
         // Create the back button
@@ -220,6 +177,7 @@ public class StoreActivity extends Activity {
                     // Handle autocoin button click here
                     // Call the method specific to autocoin button
                     clicker.activateAutoClickUpgrade(StoreActivity.this);
+                    System.out.println("Calling the autoclicker upgrade function");
 
                     // Update coins display
                     updateCoinsDisplay(clicker.getTotalCoinsEarned());
@@ -235,12 +193,12 @@ public class StoreActivity extends Activity {
 
                 }
             });
-        } else if (drawableId == R.drawable.x2_coin){
+        } else if (drawableId == R.drawable.x2_coin_icon){
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     clicker.upgradeClicker(StoreActivity.this);
-
+                    System.out.println("Calling the upgrade clicker function");
                     // Update coins display
                     updateCoinsDisplay(clicker.getTotalCoinsEarned());
 

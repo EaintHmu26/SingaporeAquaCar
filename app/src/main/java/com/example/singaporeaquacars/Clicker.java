@@ -56,9 +56,11 @@ public class Clicker {
 
     public void upgradeClicker(Context context) {
         // Double the current coins per click when upgrading
+        System.out.println("Attempting to upgrade clicker");
         int upgradeCost = 30;
         if (totalCoinsEarned >= upgradeCost) {
             // Deduct the upgrade cost from the total coins earned
+            System.out.println("Upgraded Clicker");
             totalCoinsEarned -= upgradeCost;
 
             // Double the current coins per click when upgrading
