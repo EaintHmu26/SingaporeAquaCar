@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -10,8 +10,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SingaporeAquaCars"
-        tools:targetApi="31">
+        android:theme="@style/Theme.SingaporeAquaCars">
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -21,6 +21,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".ReminderService"
+            android:exported="false"> <!-- Consider if your service needs to be exported or not -->
+        </service>
+        <receiver
+            android:name=".ReminderBroadcast"
+            android:exported="false"> <!-- Receivers targeting API 31+ need the exported flag set explicitly -->
+            <!-- If this receiver is meant to receive implicit broadcasts, set exported to true -->
+        </receiver>
     </application>
 
 </manifest>
