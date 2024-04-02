@@ -145,10 +145,13 @@ public class MainActivity extends AppCompatActivity implements Clicker.ClickerUp
         }
     }
     @Override
+    public void onUpdateCoins(int totalCoins) {
+        updateCoinsTextView(totalCoins); // Call a method to update the TextView with the new total
+    }
+
     private void updateCoinsTextView(int totalCoins) {
         coinsTextView.setText(String.valueOf(totalCoins));
     }
-   
     private void createNotificationChannel() {
         CharSequence name = getString(R.string.channel_name);
         String description = getString(R.string.channel_description);
