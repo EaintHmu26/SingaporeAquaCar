@@ -146,7 +146,13 @@ public class Clicker {
         // Rest of the save code...
 
         // Assuming you're always updating the same row, or you could use db.insertWithOnConflict with a unique identifier
-        db.update("game_progress", values, "id = ?", new String[] {"1"});
+        // db.update("game_progress", values, "id = ?", new String[] {"1"});
+        try {
+            int rowsAffected = db.update("game_progress", values, "id = ?", new String[] {"1"});
+            Log.d("Clicker", "Rows affected by update: " + rowsAffected);
+        } catch (Exception e) {
+            Log.e("Clicker", "Error updating database", e);
+        }
         db.close();
     }
     public void loadGameProgressFromDB(Context context) {
@@ -171,14 +177,17 @@ public class Clicker {
 
             if (totalCoinsEarnedIndex != -1) {
                 totalCoinsEarned = cursor.getInt(totalCoinsEarnedIndex);
+                Log.d("Clicker", "Data loaded successfully from DB: total coins earned : " + totalCoinsEarnedIndex + " " + totalCoinsEarned);
             }
 
             if (currentCoinsPerClickIndex != -1) {
                 currentCoinsPerClick = cursor.getInt(currentCoinsPerClickIndex);
+                Log.d("Clicker", "Data loaded successfully from DB: current coins per click  : " + currentCoinsPerClickIndex + " " + currentCoinsPerClick);
             }
 
             if (autoClickUpgradeActiveIndex != -1) {
                 autoClickUpgradeActive = cursor.getInt(autoClickUpgradeActiveIndex) == 1;
+                Log.d("Clicker", "Data loaded successfully from DB:  autoclick upgrade active ? : " + autoClickUpgradeActiveIndex + " " + autoClickUpgradeActive);
             }
         }
         cursor.close();
