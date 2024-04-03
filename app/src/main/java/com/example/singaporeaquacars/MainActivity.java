@@ -64,12 +64,19 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
 //        updateCoinsTextView(newCoinCount);
     }
 
+    private void loadCoinCount() {
+        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+        int coinCount = prefs.getInt("TotalCoins", 0); // 0 is a default value in case there's nothing saved yet
+        onUpdateCoins(coinCount); // Make sure to implement this method to update the UI accordingly
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         clicker.loadGameProgressFromDB(this); // Refresh game progress
         clicker.startAutoClick();
         gameView.refreshPurchasedItems();
+        loadCoinCount();
 //        updateCoinsTextView(clicker.getTotalCoinsEarned());
       
         // Cancel any set alarms as the user is back
