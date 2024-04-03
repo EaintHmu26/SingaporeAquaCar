@@ -21,10 +21,8 @@ import org.w3c.dom.Text;
 public class StoreActivity extends Activity {
 
     private static final String TAG = "StoreActivity";
-
     private Clicker clicker;
     private TextView coinsTextView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +156,6 @@ public class StoreActivity extends Activity {
         LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(imageWidth, imageHeight);
         imageParams.setMargins(0, 0, 0, padding / 2); // Add some margin below the ImageView
         imageView.setLayoutParams(imageParams);
-
         layout.addView(imageView);
 
         // Create and set up the Button
@@ -169,47 +166,88 @@ public class StoreActivity extends Activity {
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
 
+        // Specific logic for car purchase buttons
+        if (drawableId == R.drawable.car_wings_cheapest ||
+                drawableId == R.drawable.car_wings_middle ||
+                drawableId == R.drawable.car_wings_ex ||
+                drawableId == R.drawable.car_submarine) {
+            // Car purchase logic
+            button.setOnClickListener(v -> {
+                Log.d(TAG, "Attempting to purchase: " + buttonText);
+                purchaseCar(getCarKeyByDrawableId(drawableId));
+            });
+        } else {
+            // Other upgrade logic (x2 coin, autocoin, etc.)
+            button.setOnClickListener(v -> {
+                // Implement logic for non-car upgrades here
+                handleNonCarUpgrade(drawableId);
+            });
+        }
+
+        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
         // Check if the current button is the autocoin button
         if (drawableId == R.drawable.autocoin_icon) {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Handle autocoin button click here
-                    // Call the method specific to autocoin button
-                    clicker.deductAutoClickerCoin(StoreActivity.this);
-                    System.out.println("Calling the autoclicker upgrade function");
+                    int cost = 50; // Cost of the autocoin upgrade
+                    int currentCoins = clicker.getTotalCoinsEarned(); // Get current total coins
+                    if (currentCoins >= cost) {
+                        currentCoins -= cost; // Deduct the cost from the current coins
+                        clicker.deductAutoClickerCoin(StoreActivity.this);
+                        clicker.setTotalCoinsEarned(currentCoins); // Update the Clicker object with the new total
 
-                    // Update coins display
-                    updateCoinsDisplay(clicker.getTotalCoinsEarned());
+                        // Update the display to reflect the new coin count
+                        updateCoinsDisplay(currentCoins);
 
-                    SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
+                        // Update SharedPreferences to reflect the purchase
+                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("AutoCoinPurchased", true);
+                        editor.apply();
 
-                    editor.putBoolean("AutoCoinPurchased", true);
+                        // Save game progress with the updated coin count
+                        clicker.saveGameProgressToDB(StoreActivity.this);
 
-                    editor.apply();
-
-                    clicker.saveGameProgressToDB(StoreActivity.this);
-
+                        // Handle autocoin button click here
+                        System.out.println("Calling the autoclicker upgrade function");
+                    } else {
+                        // Handle case where user does not have enough coins
+                        System.out.println("Not enough coins for autocoin upgrade");
+                    }
                 }
             });
         } else if (drawableId == R.drawable.x2_coin_icon){
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    clicker.upgradeClicker(StoreActivity.this);
-                    System.out.println("Calling the upgrade clicker function");
-                    // Update coins display
-                    updateCoinsDisplay(clicker.getTotalCoinsEarned());
+                    int cost = 30; // Cost of the x2 upgrade
+                    int currentCoins = clicker.getTotalCoinsEarned(); // Get current total coins
+                    if (currentCoins >= cost) {
+                        currentCoins -= cost; // Deduct the cost from the current coins
+                        clicker.upgradeClicker(StoreActivity.this);
+                        clicker.setTotalCoinsEarned(currentCoins); // Update the Clicker object with the new total
 
-                    SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
+                        // Update the display to reflect the new coin count
+                        updateCoinsDisplay(currentCoins);
 
-                    editor.putBoolean("X2CoinPurchased", true);
+                        // Update SharedPreferences to reflect the purchase
+                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("X2CoinPurchased", true);
+                        editor.apply();
 
-                    editor.apply();
+                        // Save game progress with the updated coin count
+                        clicker.saveGameProgressToDB(StoreActivity.this);
 
-                    clicker.saveGameProgressToDB(StoreActivity.this);
+                        // Handle autocoin button click here
+                        System.out.println("Calling the autoclicker upgrade function");
+                    } else {
+                        // Handle case where user does not have enough coins
+                        System.out.println("Not enough coins for autocoin upgrade");
+                    }
                 }
             });
 
@@ -218,15 +256,24 @@ public class StoreActivity extends Activity {
                 @Override
                 public void onClick(View v) {
 
+                    int cost = 1000;
+                    if (clicker.getTotalCoinsEarned() >= cost) {
+                        updateCoinsDisplay(clicker.getTotalCoinsEarned() - cost);
 
-                    SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
+                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("CarWingsMiddlePurchased", false);
+                        editor.putBoolean("CarWingsExPurchased", false);
+                        editor.putBoolean("CarSubmarinePurchased", false);
+                        editor.putBoolean("CarWingsCheapestPurchased", true);
+                        editor.apply();
 
-                    editor.putBoolean("CarWingsCheapestPurchased", true);
-
-                    editor.apply();
-
-
+                        clicker.saveGameProgressToDB(StoreActivity.this);
+                    }
+                    clicker.upgradeClicker(StoreActivity.this);
+                    System.out.println("Calling the upgrade clicker function");
+                    // Update coins display
+                    clicker.saveGameProgressToDB(StoreActivity.this);
                 }
             });
 
@@ -235,15 +282,24 @@ public class StoreActivity extends Activity {
                 @Override
                 public void onClick(View v) {
 
+                    int cost = 1500;
+                    if (clicker.getTotalCoinsEarned() >= cost) {
+                        updateCoinsDisplay(clicker.getTotalCoinsEarned() - cost);
 
-                    SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
+                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("CarWingsMiddlePurchased", true);
+                        editor.putBoolean("CarWingsExPurchased", false);
+                        editor.putBoolean("CarSubmarinePurchased", false);
+                        editor.putBoolean("CarWingsCheapestPurchased", false);
+                        editor.apply();
 
-                    editor.putBoolean("CarWingsMiddlePurchased", true);
-
-                    editor.apply();
-
-
+                        clicker.saveGameProgressToDB(StoreActivity.this);
+                    }
+                    clicker.upgradeClicker(StoreActivity.this);
+                    System.out.println("Calling the upgrade clicker function");
+                    // Update coins display
+                    clicker.saveGameProgressToDB(StoreActivity.this);
                 }
             });
 
@@ -251,18 +307,24 @@ public class StoreActivity extends Activity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int cost = 2000;
+                    if (clicker.getTotalCoinsEarned() >= cost) {
+                        updateCoinsDisplay(clicker.getTotalCoinsEarned() - cost);
 
+                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("CarWingsMiddlePurchased", false);
+                        editor.putBoolean("CarWingsExPurchased", true);
+                        editor.putBoolean("CarSubmarinePurchased", false);
+                        editor.putBoolean("CarWingsCheapestPurchased", false);
+                        editor.apply();
 
-
-
-                    SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
-
-                    editor.putBoolean("CarWingsExPurchased", true);
-
-                    editor.apply();
-
-
+                        clicker.saveGameProgressToDB(StoreActivity.this);
+                    }
+                    clicker.upgradeClicker(StoreActivity.this);
+                    System.out.println("Calling the upgrade clicker function");
+                    // Update coins display
+                    clicker.saveGameProgressToDB(StoreActivity.this);
                 }
             });
 
@@ -270,18 +332,24 @@ public class StoreActivity extends Activity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int cost = 3000;
+                    if (clicker.getTotalCoinsEarned() >= cost) {
+                        updateCoinsDisplay(clicker.getTotalCoinsEarned() - cost);
 
+                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("CarWingsMiddlePurchased", false);
+                        editor.putBoolean("CarWingsExPurchased", false);
+                        editor.putBoolean("CarSubmarinePurchased", true);
+                        editor.putBoolean("CarWingsCheapestPurchased", false);
+                        editor.apply();
 
-
-
-                    SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
-
-                    editor.putBoolean("CarSubmarinePurchased", true);
-
-                    editor.apply();
-
-
+                        clicker.saveGameProgressToDB(StoreActivity.this);
+                    }
+                    clicker.upgradeClicker(StoreActivity.this);
+                    System.out.println("Calling the upgrade clicker function");
+                    // Update coins display
+                    clicker.saveGameProgressToDB(StoreActivity.this);
                 }
             });
 
@@ -292,8 +360,58 @@ public class StoreActivity extends Activity {
         return layout;
     }
 
+    private String getCarKeyByDrawableId(int drawableId) {
+        if (drawableId == R.drawable.car_wings_cheapest) {
+            return "CarWingsCheapestPurchased";
+        } else if (drawableId == R.drawable.car_wings_middle) {
+            return "CarWingsMiddlePurchased";
+        } else if (drawableId == R.drawable.car_wings_ex) {
+            return "CarWingsExPurchased";
+        } else if (drawableId == R.drawable.car_submarine) {
+            return "CarSubmarinePurchased";
+        } else {
+            return "";
+        }
+    }
+
+    private void purchaseCar(String purchasedCarKey) {
+        SharedPreferences prefs = getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        // Set the selected car as purchased
+        editor.putBoolean(purchasedCarKey, true);
+        editor.apply();
+
+        Log.d(TAG, purchasedCarKey + " now set to purchased");
+
+        // Optional: Save game progress or update UI as needed
+        updateCoinsDisplay(clicker.getTotalCoinsEarned());
+        clicker.saveGameProgressToDB(this);
+    }
+
+    private void handleNonCarUpgrade(int drawableId) {
+        // This method should contain the logic for handling non-car upgrades
+        // For example, handling autocoin or x2 coin purchase
+        // Remember to save any changes to SharedPreferences and update necessary UI elements
+    }
+
     public void updateCoinsDisplay(int coins) {
+        // Update the TextView to show the current number of coins
         coinsTextView.setText("Coins: " + coins);
+
+        // Save the updated coin count to SharedPreferences for persistence
+        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("TotalCoins", coins);
+        editor.apply();
+
+        // Additionally, since your Clicker class seems to manage game state,
+        // ensure the Clicker object's totalCoinsEarned field is also updated.
+        clicker.setTotalCoinsEarned(coins); // Assuming you have this setter method
+
+        // Optionally, if you're using the Clicker object to persist data,
+        // consider saving the game state here as well.
+        clicker.saveGameProgressToDB(this); // This would save to your database or SharedPreferences, wherever your game state is managed.
     }
 
     private void saveGameProgress() {
@@ -306,6 +424,4 @@ public class StoreActivity extends Activity {
         Log.d(TAG, "saving game progress");
         saveGameProgress();
     }
-
-
 }
