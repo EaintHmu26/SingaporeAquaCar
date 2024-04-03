@@ -21,10 +21,8 @@ import org.w3c.dom.Text;
 public class StoreActivity extends Activity {
 
     private static final String TAG = "StoreActivity";
-
     private Clicker clicker;
     private TextView coinsTextView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,7 +156,6 @@ public class StoreActivity extends Activity {
         LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(imageWidth, imageHeight);
         imageParams.setMargins(0, 0, 0, padding / 2); // Add some margin below the ImageView
         imageView.setLayoutParams(imageParams);
-
         layout.addView(imageView);
 
         // Create and set up the Button
@@ -168,6 +165,27 @@ public class StoreActivity extends Activity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         ));
+
+        // Specific logic for car purchase buttons
+        if (drawableId == R.drawable.car_wings_cheapest ||
+                drawableId == R.drawable.car_wings_middle ||
+                drawableId == R.drawable.car_wings_ex ||
+                drawableId == R.drawable.car_submarine) {
+            // Car purchase logic
+            button.setOnClickListener(v -> {
+                Log.d(TAG, "Attempting to purchase: " + buttonText);
+                purchaseCar(getCarKeyByDrawableId(drawableId));
+            });
+        } else {
+            // Other upgrade logic (x2 coin, autocoin, etc.)
+            button.setOnClickListener(v -> {
+                // Implement logic for non-car upgrades here
+                handleNonCarUpgrade(drawableId);
+            });
+        }
+
+        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
 
         // Check if the current button is the autocoin button
         if (drawableId == R.drawable.autocoin_icon) {
@@ -222,6 +240,9 @@ public class StoreActivity extends Activity {
                     SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
 
+                    editor.putBoolean("CarWingsMiddlePurchased", false);
+                    editor.putBoolean("CarWingsExPurchased", false);
+                    editor.putBoolean("CarSubmarinePurchased", false);
                     editor.putBoolean("CarWingsCheapestPurchased", true);
 
                     editor.apply();
@@ -239,6 +260,9 @@ public class StoreActivity extends Activity {
                     SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
 
+                    editor.putBoolean("CarWingsCheapestPurchased", false);
+                    editor.putBoolean("CarWingsExPurchased", false);
+                    editor.putBoolean("CarSubmarinePurchased", false);
                     editor.putBoolean("CarWingsMiddlePurchased", true);
 
                     editor.apply();
@@ -258,6 +282,9 @@ public class StoreActivity extends Activity {
                     SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
 
+                    editor.putBoolean("CarWingsCheapestPurchased", false);
+                    editor.putBoolean("CarWingsMiddlePurchased", false);
+                    editor.putBoolean("CarSubmarinePurchased", false);
                     editor.putBoolean("CarWingsExPurchased", true);
 
                     editor.apply();
@@ -277,6 +304,9 @@ public class StoreActivity extends Activity {
                     SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
 
+                    editor.putBoolean("CarWingsCheapestPurchased", false);
+                    editor.putBoolean("CarWingsMiddlePurchased", false);
+                    editor.putBoolean("CarWingsExPurchased", false);
                     editor.putBoolean("CarSubmarinePurchased", true);
 
                     editor.apply();
@@ -290,6 +320,41 @@ public class StoreActivity extends Activity {
         layout.addView(button);
 
         return layout;
+    }
+
+    private String getCarKeyByDrawableId(int drawableId) {
+        if (drawableId == R.drawable.car_wings_cheapest) {
+            return "CarWingsCheapestPurchased";
+        } else if (drawableId == R.drawable.car_wings_middle) {
+            return "CarWingsMiddlePurchased";
+        } else if (drawableId == R.drawable.car_wings_ex) {
+            return "CarWingsExPurchased";
+        } else if (drawableId == R.drawable.car_submarine) {
+            return "CarSubmarinePurchased";
+        } else {
+            return "";
+        }
+    }
+
+    private void purchaseCar(String purchasedCarKey) {
+        SharedPreferences prefs = getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        // Set the selected car as purchased
+        editor.putBoolean(purchasedCarKey, true);
+        editor.apply();
+
+        Log.d(TAG, purchasedCarKey + " now set to purchased");
+
+        // Optional: Save game progress or update UI as needed
+        updateCoinsDisplay(clicker.getTotalCoinsEarned());
+        clicker.saveGameProgressToDB(this);
+    }
+
+    private void handleNonCarUpgrade(int drawableId) {
+        // This method should contain the logic for handling non-car upgrades
+        // For example, handling autocoin or x2 coin purchase
+        // Remember to save any changes to SharedPreferences and update necessary UI elements
     }
 
     public void updateCoinsDisplay(int coins) {
@@ -306,6 +371,4 @@ public class StoreActivity extends Activity {
         Log.d(TAG, "saving game progress");
         saveGameProgress();
     }
-
-
 }

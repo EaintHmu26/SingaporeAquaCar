@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
         super.onResume();
         clicker.loadGameProgressFromDB(this); // Refresh game progress
         clicker.startAutoClick();
+        gameView.refreshPurchasedItems();
 //        updateCoinsTextView(clicker.getTotalCoinsEarned());
       
         // Cancel any set alarms as the user is back

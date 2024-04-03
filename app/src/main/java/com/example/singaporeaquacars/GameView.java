@@ -26,11 +26,8 @@ public class GameView extends View {
 
     Bitmap home_bkgrd_platform, car, scaledBg;
     static int dWidth, dHeight;
-
     Bitmap storeIcon;
-    static int storeIconWidth, storeIconHeight;
     ArrayList<PurpleFish> purpleFish;
-    //ArrayList<RobotFish> robotFish;
     ArrayList<Shark> shark;
     Handler handler;
     Runnable runnable;
@@ -45,6 +42,7 @@ public class GameView extends View {
     int plusOneAlpha = 255; //fading effect
     Paint plusOnePaint;
     private OnCoinCountChangeListener coinCountChangeListener;
+    private static final int REQUEST_CODE_STORE = 1;
 
     public GameView(Context context){
         super(context);
@@ -52,9 +50,6 @@ public class GameView extends View {
 
         home_bkgrd_platform = BitmapFactory.decodeResource(getResources(), R.drawable.home_bkgrd_platform);
         Log.d("GameView", "Background loaded");
-
-        car = BitmapFactory.decodeResource(getResources(), R.drawable.original_car);
-        Log.d("GameView", "car loaded");
 
         storeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.store);
 
@@ -64,8 +59,6 @@ public class GameView extends View {
         int iconHeight = (int) (iconWidth * aspectRatio1);
         storeIcon = Bitmap.createScaledBitmap(storeIcon, iconWidth, iconHeight, false);
 
-
-
         Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -74,9 +67,10 @@ public class GameView extends View {
         scaledBg = Bitmap.createScaledBitmap(home_bkgrd_platform, dWidth, dHeight, true);
 
         purpleFish = new ArrayList<>();
-        //robotFish = new ArrayList<RobotFish>();
         shark = new ArrayList<Shark>();
         initializeFish();
+
+        loadPurchasedItems();
 
         for (int i = 0; i < 3; i++) {
             PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
@@ -113,6 +107,54 @@ public class GameView extends View {
         plusOnePaint.setColor(Color.YELLOW);
         plusOnePaint.setTextSize(TEXT_SIZE * 1.5f);
         plusOnePaint.setAntiAlias(true);
+    }
+
+    private void updateCarImage() {
+        // Resize the car as specified
+        if(car != null) { // Check to make sure the car bitmap is not null
+            float aspectRatio = (float) car.getHeight() / (float) car.getWidth();
+            carWidth = 4 * dWidth / 5; // Example resizing logic, adjust as necessary
+            carHeight = (int) (carWidth * aspectRatio);
+            car = Bitmap.createScaledBitmap(car, carWidth, carHeight, false);
+        }
+        invalidate(); // Redraw the view to reflect changes
+    }
+
+    private void loadPurchasedItems() {
+        SharedPreferences gamePrefs = context.getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+
+        Log.d("GameView", "Loading purchased items to determine which car to display");
+
+        if (gamePrefs.getBoolean("CarSubmarinePurchased", false)) {
+            Log.d("GameView", "Submarine purchased");
+            car = BitmapFactory.decodeResource(getResources(), R.drawable.car_submarine);
+        } else if (gamePrefs.getBoolean("CarWingsExPurchased", false)) {
+            Log.d("GameView", "Wings Ex purchased");
+            car = BitmapFactory.decodeResource(getResources(), R.drawable.car_wings_ex);
+        } else if (gamePrefs.getBoolean("CarWingsMiddlePurchased", false)) {
+            Log.d("GameView", "Wings Middle purchased");
+            car = BitmapFactory.decodeResource(getResources(), R.drawable.car_wings_middle);
+        } else if (gamePrefs.getBoolean("CarWingsCheapestPurchased", false)) {
+            Log.d("GameView", "Wings Cheapest purchased");
+            car = BitmapFactory.decodeResource(getResources(), R.drawable.car_wings_cheapest);
+        } else {
+            Log.d("GameView", "No car purchased, using default");
+            car = BitmapFactory.decodeResource(getResources(), R.drawable.original_car);
+        }
+        // Apply any necessary adjustments to the car's dimensions
+        updateCarImage();
+    }
+
+    public void refreshPurchasedItems() {
+        loadPurchasedItems();
+
+        // Resize the car as specified
+        float aspectRatio = (float) car.getHeight() / (float) car.getWidth();
+        carWidth = 4 * dWidth / 5;
+        carHeight = (int) (carWidth * aspectRatio);
+        car = Bitmap.createScaledBitmap(car, carWidth, carHeight, false);
+
+        invalidate(); // Redraw the view to reflect changes
     }
 
     public interface OnCoinCountChangeListener {
@@ -218,11 +260,9 @@ public class GameView extends View {
         }
         invalidate(); // Keep the loop going
 
-
         int carX = dWidth / 2 - carWidth / 2;
         int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07); // Adjust this factor to move the car down
         canvas.drawBitmap(car, carX, carY, null);
-
 
         if (showPlusOne) {
             canvas.drawText("+1", plusOneX, plusOneY, plusOnePaint);
@@ -232,7 +272,6 @@ public class GameView extends View {
         int iconX = dWidth - storeIcon.getWidth() - 30; // 50 is a margin from the right edge
         int iconY = 30; // 50 is a margin from the top edge
         canvas.drawBitmap(storeIcon, iconX, iconY, null);
-
 
         // Display the coin count
         canvas.drawText("Coins: $" + coinCount, 20, TEXT_SIZE + 20, coinCountPaint);
@@ -281,9 +320,14 @@ public class GameView extends View {
     }
 
     private void openStore() {
-        // Intent to start StoreActivity
-        Intent intent = new Intent(context, StoreActivity.class);
-        context.startActivity(intent);
+        if (context instanceof Activity) {
+            // Intent to start StoreActivity
+            Intent intent = new Intent(context, StoreActivity.class);
+            ((Activity) context).startActivityForResult(intent, REQUEST_CODE_STORE);
+        } else {
+            // Handle the error condition or throw an exception
+            Log.e("GameView", "Context used is not an Activity context");
+        }
     }
 }
 
