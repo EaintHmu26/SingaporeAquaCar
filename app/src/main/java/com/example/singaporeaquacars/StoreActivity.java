@@ -67,7 +67,8 @@ public class StoreActivity extends Activity {
             updateCoinsDisplay(clicker.getTotalCoinsEarned());
 
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("X2CoinPurchased", true);
+            int coin = prefs.getInt("X2CoinPurchased", 1);
+            editor.putInt("X2CoinPurchased", coin*2);
             editor.apply();
         } else {
             Log.d(TAG, "Insufficient Coins to deduct for x2 coin upgrade");

@@ -274,7 +274,8 @@ public class GameView extends View {
         canvas.drawBitmap(car, carX, carY, null);
 
         if (showPlusOne) {
-            canvas.drawText("+1", plusOneX, plusOneY, plusOnePaint);
+            SharedPreferences gamePrefs = context.getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+            canvas.drawText("+" + gamePrefs.getInt("X2CoinPurchased", 1) , plusOneX, plusOneY, plusOnePaint);
         }
 
         // Draw the store icon at a specific position, e.g., top-right corner
@@ -312,7 +313,8 @@ public class GameView extends View {
             int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07); // Adjust this factor to move the car down
             // Check if the touch is within the bounds of the car image
             if (touchX >= carX && touchX < (carX + carWidth) && touchY >= carY && touchY < (carY + carHeight)) {
-                coinCount += clicker.getCurrentCoinsPerClick(); // Increment coin count only if the car is touched
+                SharedPreferences gamePrefs = context.getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
+                coinCount += gamePrefs.getInt("X2CoinPurchased", 1);//clicker.getCurrentCoinsPerClick(); // Increment coin count only if the car is touched
                 Log.d("GameView", "clicker count" + clicker.getCurrentCoinsPerClick());
                 saveCoinCount();
                 showPlusOne = true;
