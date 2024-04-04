@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.example.singaporeaquacars.Clicker;
 
 import org.w3c.dom.Text;
@@ -27,60 +29,28 @@ public class StoreActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_store);
 
         clicker = new Clicker();
         clicker.loadGameProgressFromDB(this);
+        clicker.setContinuousClickActive(false);
         int currentCoins = clicker.getTotalCoinsEarned();
-        //currentCoins = 50;
+//        Log.d(TAG,"Clicker before upgrade "+clicker.getCurrentCoinsPerClick());
+//        Log.d(TAG,"Coins before upgrade "+currentCoins);
 
-        // Create a FrameLayout as the root layout
-        FrameLayout frameLayout = new FrameLayout(this);
-        frameLayout.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
+        // Update coins display
+        coinsTextView = findViewById(R.id.coinsTextView);
+        coinsTextView.setText(getString(R.string.coins_display, currentCoins));
 
-        // Create and set up the ImageView for the background
-        ImageView backgroundImageView = new ImageView(this);
-        backgroundImageView.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
-        backgroundImageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // maintain the aspect ratio
-        backgroundImageView.setImageResource(R.drawable.store_background);
 
-        // Add the ImageView to the FrameLayout
-        frameLayout.addView(backgroundImageView);
-
-        // Create the ScrollView which will contain your mainLayout
-        ScrollView scrollView = new ScrollView(this);
-        scrollView.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
-
-        // Create the main layout that contains your UI elements
-        LinearLayout mainLayout = new LinearLayout(this);
-        mainLayout.setOrientation(LinearLayout.VERTICAL);
-
-        // Define padding and imageSize
+        // Dynamic UI elements setup
+        LinearLayout mainLayout = findViewById(R.id.mainLayout);
         int padding = (int) (25 * getResources().getDisplayMetrics().density);
         int imageSize = (int) (0.5 * getResources().getDisplayMetrics().widthPixels); // smaller size for icons
 
-        // Create and set up the TextView for the coin count at the top.
-        coinsTextView = new TextView(this);
-        coinsTextView.setText("Coins: " + currentCoins);
-        coinsTextView.setTextSize(20);
-        coinsTextView.setTextColor(Color.WHITE); // Set a color that contrasts with your background.
-        coinsTextView.setGravity(Gravity.CENTER_HORIZONTAL);
-
-        LinearLayout.LayoutParams coinsTextParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        coinsTextParams.gravity = Gravity.CENTER_HORIZONTAL;
-        coinsTextParams.setMargins(0, padding, 0, padding);
-        coinsTextView.setLayoutParams(coinsTextParams);
 
         // Add the TextView to the main layout before the upgrade sections.
-        mainLayout.addView(coinsTextView);
+        //mainLayout.addView(coinsTextView);
 
         mainLayout.addView(createUpgradeSection(
                 R.drawable.x2_coin_icon, "x2 Coin - $30", imageSize, padding));
@@ -97,12 +67,7 @@ public class StoreActivity extends Activity {
 
         // ... add your UI elements to mainLayout ...
 
-        // Add the ScrollView containing your mainLayout to the FrameLayout
-        scrollView.addView(mainLayout);
-        frameLayout.addView(scrollView);
 
-        // Finally, set the FrameLayout as the content view
-        setContentView(frameLayout);
 
         // Add the back button dynamically
         addButtonToLayout(mainLayout);
@@ -128,6 +93,7 @@ public class StoreActivity extends Activity {
             public void onClick(View v) {
                 onBackPressed();
             }
+
         });
 
         // Add the button to the layout
@@ -192,30 +158,24 @@ public class StoreActivity extends Activity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int cost = 50; // Cost of the autocoin upgrade
-                    int currentCoins = clicker.getTotalCoinsEarned(); // Get current total coins
-                    if (currentCoins >= cost) {
-                        currentCoins -= cost; // Deduct the cost from the current coins
-                        clicker.deductAutoClickerCoin(StoreActivity.this);
-                        clicker.setTotalCoinsEarned(currentCoins); // Update the Clicker object with the new total
+                    // Handle autocoin button click here
+                    // Call the method specific to autocoin button
+                    boolean deducted = clicker.deductCoins(50);
 
-                        // Update the display to reflect the new coin count
-                        updateCoinsDisplay(currentCoins);
+                    if(deducted){
+                        Log.d(TAG, "Bought the autoclicker upgrade function");
 
-                        // Update SharedPreferences to reflect the purchase
+                        // Update coins display
+                        updateCoinsDisplay(clicker.getTotalCoinsEarned());
+
                         SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putBoolean("AutoCoinPurchased", true);
                         editor.apply();
+                        finish();
 
-                        // Save game progress with the updated coin count
-                        clicker.saveGameProgressToDB(StoreActivity.this);
-
-                        // Handle autocoin button click here
-                        System.out.println("Calling the autoclicker upgrade function");
-                    } else {
-                        // Handle case where user does not have enough coins
-                        System.out.println("Not enough coins for autocoin upgrade");
+                    }else{
+                        Log.d(TAG, "Insufficient Coins to deduct for autoclicker upgrade");
                     }
                 }
             });
@@ -223,30 +183,22 @@ public class StoreActivity extends Activity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int cost = 30; // Cost of the x2 upgrade
-                    int currentCoins = clicker.getTotalCoinsEarned(); // Get current total coins
-                    if (currentCoins >= cost) {
-                        currentCoins -= cost; // Deduct the cost from the current coins
+                    boolean deducted = clicker.deductCoins(30);
+                    if(deducted){
+                        Log.d(TAG,"Calling the upgrade clicker function");
+                        Log.d(TAG,"Clicker before upgrade "+clicker.getCurrentCoinsPerClick());
                         clicker.upgradeClicker(StoreActivity.this);
-                        clicker.setTotalCoinsEarned(currentCoins); // Update the Clicker object with the new total
+                        // Update coins display
+                        updateCoinsDisplay(clicker.getTotalCoinsEarned());
 
-                        // Update the display to reflect the new coin count
-                        updateCoinsDisplay(currentCoins);
-
-                        // Update SharedPreferences to reflect the purchase
                         SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
+
                         editor.putBoolean("X2CoinPurchased", true);
+
                         editor.apply();
-
-                        // Save game progress with the updated coin count
-                        clicker.saveGameProgressToDB(StoreActivity.this);
-
-                        // Handle autocoin button click here
-                        System.out.println("Calling the autoclicker upgrade function");
-                    } else {
-                        // Handle case where user does not have enough coins
-                        System.out.println("Not enough coins for autocoin upgrade");
+                    }else{
+                        Log.d(TAG, "Insufficient Coins to deduct for x2 coin upgrade");
                     }
                 }
             });

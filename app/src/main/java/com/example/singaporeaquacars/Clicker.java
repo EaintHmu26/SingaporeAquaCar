@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class Clicker {
+    private static final String TAG = "Clicker";
     private int currentCoinsPerClick;
     private int totalCoinsEarned;
     private HandlerThread handlerThread;
@@ -56,29 +57,43 @@ public class Clicker {
     }
 
     public void handleClick() {
-        totalCoinsEarned += currentCoinsPerClick;
-        if (updateListener != null) {
-            new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(totalCoinsEarned));
+        int total = totalCoinsEarned + currentCoinsPerClick;
+        if(total >1000000){
+            Log.d(TAG,"Coins stopped accumulating");
+            if (updateListener != null) {
+                new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(1000000));
+            };
+        }else{
+            totalCoinsEarned = total;
+            if (updateListener != null) {
+                new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(totalCoinsEarned));
+            };
+            Log.d(TAG, "Clicker clicking at: " + currentCoinsPerClick);
+            Log.d(TAG, "Clicking updated: " + totalCoinsEarned);
         }
-        System.out.println("Clicker clicking at: " + currentCoinsPerClick);
-        System.out.println("Clicking updated: " + totalCoinsEarned);
     }
 
     public void upgradeClicker(Context context) {
-        // Double the current coins per click when upgrading
-        System.out.println("Attempting to upgrade clicker");
-        int upgradeCost = 30;
-        if (totalCoinsEarned >= upgradeCost) {
-            // Deduct the upgrade cost from the total coins earned
-            System.out.println("Upgraded Clicker");
-            totalCoinsEarned -= upgradeCost;
+            if(currentCoinsPerClick < 2048){
+                // Double the current coins per click when upgrading
+                Log.d(TAG, "before upgrade clicker "+currentCoinsPerClick);
+                currentCoinsPerClick *= 2;
+                Log.d(TAG, "Upgraded Clicker " + currentCoinsPerClick);
+            }else{
+                Log.d(TAG, "Maximum upgrade attained");
+                totalCoinsEarned+=30;
+            }
+    }
 
-            // Double the current coins per click when upgrading
-            currentCoinsPerClick *= 2;
-        } else {
-            // Display a Toast message for insufficient funds
-            Toast.makeText(context, "Insufficient coins to upgrade", Toast.LENGTH_SHORT).show();
+    public boolean deductCoins(int amount){
+        Log.d(TAG, "Attempting to deduct coins");
+        boolean deduct = false;
+        if (totalCoinsEarned >= amount) {
+            // Deduct the upgrade cost from the total coins earned
+            totalCoinsEarned -= amount;
+            deduct = true;
         }
+        return deduct;
     }
 
     public void startAutoClick() {
@@ -95,60 +110,14 @@ public class Clicker {
 
     public void activateContinuousAutoClickUpgrade(Context context) {
         if (!continuousClickActive) {
-            System.out.println("starting autoclicker");
+            Log.d(TAG,"starting autoclicker");
             continuousClickActive = true;
             autoClickHandler.postDelayed(continuousClickRunnable, 1000); // Start immediately
 
             // Schedule deactivation of continuous clicking after 30 seconds
-            autoClickHandler.postDelayed(() -> {
-                stopContinuousClicking();
-            }, AUTO_CLICK_DURATION);
+            autoClickHandler.postDelayed(this::stopContinuousClicking, AUTO_CLICK_DURATION);
         }
     }
-
-    public void deductAutoClickerCoin(Context context){
-        int upgradeCost = 50;
-        if (totalCoinsEarned >= upgradeCost) {
-            // Deduct the upgrade cost from the total coins earned
-            totalCoinsEarned -= upgradeCost;
-
-            // Activate auto-click upgrade for 30 seconds
-        } else {
-            // Display a message or handle insufficient funds
-            Toast.makeText(context, "Insufficient coins to upgrade", Toast.LENGTH_SHORT).show();
-        }
-    }
-//    public void activateAutoClickUpgrade(Context context) {
-//        System.out.println("starting autoclicker");
-//
-//        final int incrementInterval = 1000; // Increment every second, for example
-//        autoClickHandler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                // Check if auto-clicker is still active
-//                if (autoClickUpgradeActive) {
-//                    // Increase coins
-//                    totalCoinsEarned += 1; // Increase by 1 or your desired amount
-//
-//                    // Notify the listener
-//                    if (updateListener != null) {
-//                        updateListener.onUpdateCoins(totalCoinsEarned);
-//                    }
-//
-//                    // Schedule the next increment
-//                    autoClickHandler.postDelayed(this, incrementInterval);
-//                }
-//            }
-//        }, incrementInterval);
-//
-//        autoClickHandler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                deactivateAutoClickUpgrade();
-//            }
-//        }, AUTO_CLICK_DURATION);
-//
-//    }
 
     public void stopContinuousClicking() {
         if (continuousClickActive) {
@@ -158,10 +127,14 @@ public class Clicker {
         }
     }
 
+
     public boolean isContinuousClickActive() {
         return continuousClickActive;
     }
 
+    public void setContinuousClickActive(boolean active){
+        this.continuousClickActive = active;
+    }
     // Getter and setter methods for currentCoinsPerClick and totalCoinsEarned
     public int getCurrentCoinsPerClick() {
         return currentCoinsPerClick;
@@ -181,6 +154,7 @@ public class Clicker {
     public void setTotalCoinsEarned(int totalCoinsEarned) {
         this.totalCoinsEarned = totalCoinsEarned;
     }
+
 
     public void saveGameProgressToDB(Context context) {
         ClickerDbHelper dbHelper = new ClickerDbHelper(context);
