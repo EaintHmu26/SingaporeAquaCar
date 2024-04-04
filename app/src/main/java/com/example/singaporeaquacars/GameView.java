@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.os.Handler;
 
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -44,9 +45,17 @@ public class GameView extends View {
     private OnCoinCountChangeListener coinCountChangeListener;
     private static final int REQUEST_CODE_STORE = 1;
 
+    private Clicker clicker;
+
+
+
+
     public GameView(Context context){
         super(context);
         this.context = context;
+
+        clicker = new Clicker();
+        clicker.loadGameProgressFromDB(this.getContext());
 
         home_bkgrd_platform = BitmapFactory.decodeResource(getResources(), R.drawable.home_bkgrd_platform);
         Log.d("GameView", "Background loaded");
@@ -196,13 +205,13 @@ public class GameView extends View {
         for (int i = 0; i < 3; i++) {
             PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
             purpleFish.add(aPurpleFish);
-            Log.d("GameView", "PurpleFish added");
+            //Log.d("GameView", "PurpleFish added");
 
         }
         //i just want to add one shark
         Shark ashark = new Shark(context, dWidth, dHeight);
         shark.add(ashark);
-        Log.d("GameView", "shark added");
+        //Log.d("GameView", "shark added");
 
     }
 
@@ -237,7 +246,7 @@ public class GameView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
-        Log.d("GameView", "onDraw called");
+        //Log.d("GameView", "onDraw called");
 
         if (scaledBg.getWidth() != getWidth() || scaledBg.getHeight() != getHeight()) {
             scaledBg = Bitmap.createScaledBitmap(home_bkgrd_platform, getWidth(), getHeight(), true);
@@ -246,9 +255,9 @@ public class GameView extends View {
         canvas.drawBitmap(scaledBg, 0, 0, null);
 
 
-        Log.d("GameView", "PurpleFish size: " + purpleFish.size());
+        //Log.d("GameView", "PurpleFish size: " + purpleFish.size());
 //        Log.d("GameView", "RobotFish size: " + robotFish.size());
-        Log.d("GameView", "Shark size: " + shark.size());
+        //Log.d("GameView", "Shark size: " + shark.size());
 
         for (PurpleFish fish : purpleFish) {
             fish.update();  // Update position and check for looping
@@ -303,7 +312,8 @@ public class GameView extends View {
             int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07); // Adjust this factor to move the car down
             // Check if the touch is within the bounds of the car image
             if (touchX >= carX && touchX < (carX + carWidth) && touchY >= carY && touchY < (carY + carHeight)) {
-                coinCount++; // Increment coin count only if the car is touched
+                coinCount += clicker.getCurrentCoinsPerClick(); // Increment coin count only if the car is touched
+                Log.d("GameView", "clicker count" + clicker.getCurrentCoinsPerClick());
                 saveCoinCount();
                 showPlusOne = true;
                 plusOneX = carX + carWidth / 2;

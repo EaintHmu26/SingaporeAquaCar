@@ -27,60 +27,25 @@ public class StoreActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_store);
 
         clicker = new Clicker();
         clicker.loadGameProgressFromDB(this);
         int currentCoins = clicker.getTotalCoinsEarned();
-        //currentCoins = 50;
 
-        // Create a FrameLayout as the root layout
-        FrameLayout frameLayout = new FrameLayout(this);
-        frameLayout.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
+        // Update coins display
+        coinsTextView = findViewById(R.id.coinsTextView);
+        coinsTextView.setText(getString(R.string.coins_display, currentCoins));
 
-        // Create and set up the ImageView for the background
-        ImageView backgroundImageView = new ImageView(this);
-        backgroundImageView.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
-        backgroundImageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // maintain the aspect ratio
-        backgroundImageView.setImageResource(R.drawable.store_background);
 
-        // Add the ImageView to the FrameLayout
-        frameLayout.addView(backgroundImageView);
-
-        // Create the ScrollView which will contain your mainLayout
-        ScrollView scrollView = new ScrollView(this);
-        scrollView.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
-
-        // Create the main layout that contains your UI elements
-        LinearLayout mainLayout = new LinearLayout(this);
-        mainLayout.setOrientation(LinearLayout.VERTICAL);
-
-        // Define padding and imageSize
+        // Dynamic UI elements setup
+        LinearLayout mainLayout = findViewById(R.id.mainLayout);
         int padding = (int) (25 * getResources().getDisplayMetrics().density);
         int imageSize = (int) (0.5 * getResources().getDisplayMetrics().widthPixels); // smaller size for icons
 
-        // Create and set up the TextView for the coin count at the top.
-        coinsTextView = new TextView(this);
-        coinsTextView.setText("Coins: " + currentCoins);
-        coinsTextView.setTextSize(20);
-        coinsTextView.setTextColor(Color.WHITE); // Set a color that contrasts with your background.
-        coinsTextView.setGravity(Gravity.CENTER_HORIZONTAL);
-
-        LinearLayout.LayoutParams coinsTextParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        coinsTextParams.gravity = Gravity.CENTER_HORIZONTAL;
-        coinsTextParams.setMargins(0, padding, 0, padding);
-        coinsTextView.setLayoutParams(coinsTextParams);
 
         // Add the TextView to the main layout before the upgrade sections.
-        mainLayout.addView(coinsTextView);
+        //mainLayout.addView(coinsTextView);
 
         mainLayout.addView(createUpgradeSection(
                 R.drawable.x2_coin_icon, "x2 Coin - $30", imageSize, padding));
@@ -97,12 +62,7 @@ public class StoreActivity extends Activity {
 
         // ... add your UI elements to mainLayout ...
 
-        // Add the ScrollView containing your mainLayout to the FrameLayout
-        scrollView.addView(mainLayout);
-        frameLayout.addView(scrollView);
 
-        // Finally, set the FrameLayout as the content view
-        setContentView(frameLayout);
 
         // Add the back button dynamically
         addButtonToLayout(mainLayout);
@@ -128,6 +88,7 @@ public class StoreActivity extends Activity {
             public void onClick(View v) {
                 onBackPressed();
             }
+
         });
 
         // Add the button to the layout
