@@ -18,6 +18,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 public class MainActivity extends AppCompatActivity implements GameView.OnCoinCountChangeListener, Clicker.ClickerUpdateListener {
 
+    private static final String TAG = "Main";
     private Clicker clicker;
 //    private TextView coinsTextView;
     public static final String EXTRA_SHOW_NOTIFICATION_PERMISSION = "extra_notification";
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     protected void onResume() {
         super.onResume();
         clicker.loadGameProgressFromDB(this); // Refresh game progress
-        Log.d("MainActivity", "clicker coins per click" + clicker.getCurrentCoinsPerClick());
+        Log.d(TAG, "clicker coins per click" + clicker.getCurrentCoinsPerClick());
         clicker.startAutoClick();
         gameView.refreshPurchasedItems();
         loadCoinCount();
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     @Override
     protected void onPause() {
         super.onPause();
-        System.out.println("DB is saving on pause event");
+        Log.d(TAG,"DB is saving on pause event");
         clicker.saveGameProgressToDB(this);
         clicker.stopAutoClick();
         // Assume the user is no longer actively using the app
@@ -119,14 +120,14 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     @Override
     protected void onStop() {
         super.onStop();
-        System.out.println("DB is saving on stop event");
+        Log.d(TAG,"DB is saving on stop event");
         clicker.saveGameProgressToDB(this); // Save game progress
         clicker.stopAutoClick();
     }
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        System.out.println("DB is saving on destroy event");
+        Log.d(TAG,"DB is saving on destroy event");
         clicker.saveGameProgressToDB(this); // Attempt to save game progress
         clicker.stopAutoClick();
         // Check if the app is not switching between configurations
