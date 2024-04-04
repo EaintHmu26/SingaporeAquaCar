@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.example.singaporeaquacars.Clicker;
 
 import org.w3c.dom.Text;
@@ -32,6 +34,7 @@ public class StoreActivity extends Activity {
 
         clicker = new Clicker();
         clicker.loadGameProgressFromDB(this);
+        clicker.setContinuousClickActive(0);
         int currentCoins = clicker.getTotalCoinsEarned();
         //currentCoins = 50;
 
@@ -176,20 +179,24 @@ public class StoreActivity extends Activity {
                 public void onClick(View v) {
                     // Handle autocoin button click here
                     // Call the method specific to autocoin button
-                    clicker.deductAutoClickerCoin(StoreActivity.this);
-                    System.out.println("Calling the autoclicker upgrade function");
+                    boolean deducted = clicker.deductCoins(50);
 
-                    // Update coins display
-                    updateCoinsDisplay(clicker.getTotalCoinsEarned());
+                    if(deducted){
+                        Log.d(TAG, "Bought the autoclicker upgrade function");
 
-                    SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
+                        // Update coins display
+                        updateCoinsDisplay(clicker.getTotalCoinsEarned());
 
-                    editor.putBoolean("AutoCoinPurchased", true);
+                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
 
-                    editor.apply();
+                        editor.putBoolean("AutoCoinPurchased", true);
 
-                    clicker.saveGameProgressToDB(StoreActivity.this);
+                        editor.apply();
+
+                    }else{
+                        Log.d(TAG, "Insufficient Coins to deduct for autoclicker upgrade");
+                    }
 
                 }
             });
@@ -197,19 +204,22 @@ public class StoreActivity extends Activity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    clicker.upgradeClicker(StoreActivity.this);
-                    System.out.println("Calling the upgrade clicker function");
-                    // Update coins display
-                    updateCoinsDisplay(clicker.getTotalCoinsEarned());
+                    boolean deducted = clicker.deductCoins(30);
+                    if(deducted){
+                        Log.d(TAG,"Calling the upgrade clicker function");
+                        clicker.upgradeClicker(StoreActivity.this);
+                        // Update coins display
+                        updateCoinsDisplay(clicker.getTotalCoinsEarned());
 
-                    SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
+                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
 
-                    editor.putBoolean("X2CoinPurchased", true);
+                        editor.putBoolean("X2CoinPurchased", true);
 
-                    editor.apply();
-
-                    clicker.saveGameProgressToDB(StoreActivity.this);
+                        editor.apply();
+                    }else{
+                        Log.d(TAG, "Insufficient Coins to deduct for x2 coin upgrade");
+                    }
                 }
             });
 
