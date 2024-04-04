@@ -57,19 +57,32 @@ public class Clicker {
     }
 
     public void handleClick() {
-        totalCoinsEarned += currentCoinsPerClick;
-        if (updateListener != null) {
-            new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(totalCoinsEarned));
-        };
-        Log.d(TAG, "Clicker clicking at: " + currentCoinsPerClick);
-        Log.d(TAG, "Clicking updated: " + totalCoinsEarned);
+        int total = totalCoinsEarned + currentCoinsPerClick;
+        if(total >1000000){
+            Log.d(TAG,"Coins stopped accumulating");
+            if (updateListener != null) {
+                new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(1000000));
+            };
+        }else{
+            totalCoinsEarned = total;
+            if (updateListener != null) {
+                new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(totalCoinsEarned));
+            };
+            Log.d(TAG, "Clicker clicking at: " + currentCoinsPerClick);
+            Log.d(TAG, "Clicking updated: " + totalCoinsEarned);
+        }
     }
 
     public void upgradeClicker(Context context) {
-        // Double the current coins per click when upgrading
-            Log.d(TAG, "Upgraded Clicker");
-            // Double the current coins per click when upgrading
-            currentCoinsPerClick *= 2;
+            if(currentCoinsPerClick < 2048){
+                // Double the current coins per click when upgrading
+                Log.d(TAG, "before upgrade clicker "+currentCoinsPerClick);
+                currentCoinsPerClick *= 2;
+                Log.d(TAG, "Upgraded Clicker " + currentCoinsPerClick);
+            }else{
+                Log.d(TAG, "Maximum upgrade attained");
+                totalCoinsEarned+=30;
+            }
     }
 
     public boolean deductCoins(int amount){
@@ -119,8 +132,8 @@ public class Clicker {
         return continuousClickActive;
     }
 
-    public void setContinuousClickActive(int active){
-        this.setCurrentCoinsPerClick(active);
+    public void setContinuousClickActive(boolean active){
+        this.continuousClickActive = active;
     }
     // Getter and setter methods for currentCoinsPerClick and totalCoinsEarned
     public int getCurrentCoinsPerClick() {
