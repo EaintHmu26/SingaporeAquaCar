@@ -1,3 +1,44 @@
+<!--&lt;!&ndash; activity_store.xml &ndash;&gt;-->
+<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    tools:context=".StoreActivity">-->
+
+<!--    <ImageView-->
+<!--        android:id="@+id/backgroundImageView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:scaleType="centerCrop"-->
+<!--        android:src="@drawable/store_background" />-->
+
+<!--    <ScrollView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
+
+<!--        <LinearLayout-->
+<!--            android:id="@+id/mainLayout"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical"-->
+<!--            android:padding="16dp">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/coinsTextView"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center_horizontal"-->
+<!--                android:textColor="#FFFFFF"-->
+<!--                android:textSize="20sp" />-->
+
+
+
+<!--        </LinearLayout>-->
+<!--    </ScrollView>-->
+<!--</FrameLayout>-->
+
+
+
 <!-- activity_store.xml -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -21,6 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:gravity="center_horizontal"
             android:padding="16dp">
 
             <TextView
@@ -31,8 +73,133 @@
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
+            <!-- x2 Coin Upgrade -->
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/x2_coin_icon"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/x2_coin_description"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"/>
 
+            <Button
+                android:id="@+id/upgrade_x2_coin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="X2 COIN - $30"
+                android:textColor="@color/black"
+                android:layout_gravity="center_horizontal"
+                 />
 
+            <!-- Auto Coin Upgrade -->
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/autocoin_icon"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/auto_coin_description"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/upgrade_autocoin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AUTO COIN - $50"
+                android:textColor="@color/black"
+                android:layout_gravity="center_horizontal"/>
+
+            <!-- Wings 1 Upgrade -->
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/car_wings_cheapest"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/wings1_description"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"/>
+
+            <Button
+                android:id="@+id/upgrade_wings1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WINGS 1 - $1000"
+                android:textColor="@color/black"
+                android:layout_gravity="center_horizontal"/>
+
+            <!-- Wings 2 Upgrade -->
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/car_wings_middle"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/wings2_description"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <Button
+                android:id="@+id/upgrade_wings2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WINGS 2 - $1500"
+                android:textColor="@color/black"
+                android:layout_gravity="center_horizontal"/>
+
+            <!-- Wings 3 Upgrade -->
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/car_wings_ex"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/wings3_description"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <Button
+                android:id="@+id/upgrade_wings3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WINGS 3 - $2000"
+                android:textColor="@color/black"
+                android:layout_gravity="center_horizontal"/>
+
+            <!-- Submarine Upgrade -->
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/car_submarine"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/submarine_description"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <Button
+                android:id="@+id/upgrade_submarine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SUBMARINE - $3000"
+                android:textColor="@color/black"
+                android:layout_gravity="center_horizontal"/>
+
+            <!-- Back Button -->
+            <Button
+                android:id="@+id/backButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/back_to_game"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"/>
         </LinearLayout>
     </ScrollView>
 </FrameLayout>
+

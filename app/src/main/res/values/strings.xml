@@ -3,4 +3,11 @@
     <string name="channel_name">AquaCarsNotificationChannel</string>
     <string name="channel_description">Notification channel for SingaporeAquaCars</string>
     <string name="coins_display">Coins: %1$d</string>
+    <string name="x2_coin_description">Double coin upgrade</string>
+    <string name="auto_coin_description">Automatic coin collector upgrade</string>
+    <string name="wings1_description">First level wings upgrade</string>
+    <string name="wings2_description">Second level wings upgrade</string>
+    <string name="wings3_description">Third level wings upgrade</string>
+    <string name="submarine_description">Submarine upgrade for underwater exploration</string>
+    <string name="back_to_game">Back to game</string>
 </resources>
