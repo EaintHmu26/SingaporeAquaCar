@@ -88,6 +88,7 @@ public class StoreActivity extends Activity {
             public void onClick(View v) {
                 onBackPressed();
             }
+
         });
 
         // Add the button to the layout

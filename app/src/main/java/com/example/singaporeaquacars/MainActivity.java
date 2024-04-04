@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
 
     private void loadCoinCount() {
         SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-        int coinCount = prefs.getInt("TotalCoins", 0); // 0 is a default value in case there's nothing saved yet
+        int coinCount = clicker.getTotalCoinsEarned();//prefs.getInt("TotalCoins", 0); // 0 is a default value in case there's nothing saved yet
         onUpdateCoins(coinCount); // Make sure to implement this method to update the UI accordingly
     }
 
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     protected void onResume() {
         super.onResume();
         clicker.loadGameProgressFromDB(this); // Refresh game progress
+        Log.d("MainActivity", "clicker coins per click" + clicker.getCurrentCoinsPerClick());
         clicker.startAutoClick();
         gameView.refreshPurchasedItems();
         loadCoinCount();
