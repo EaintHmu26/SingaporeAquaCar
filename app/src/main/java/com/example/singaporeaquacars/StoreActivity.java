@@ -57,9 +57,10 @@ public class StoreActivity extends Activity {
     }
     private void handleX2CoinPurchase() {
         SharedPreferences prefs = getPreferences();
+        int multiplier = prefs.getInt("X2CoinPurchased",1);
 
         boolean deducted = clicker.deductCoins(30);
-        if (deducted) {
+        if (deducted && multiplier < 2048) {
             Log.d(TAG,"Calling the upgrade clicker function");
             Log.d(TAG,"Clicker before upgrade "+clicker.getCurrentCoinsPerClick());
             clicker.upgradeClicker(StoreActivity.this);
@@ -67,12 +68,15 @@ public class StoreActivity extends Activity {
             updateCoinsDisplay(clicker.getTotalCoinsEarned());
 
             SharedPreferences.Editor editor = prefs.edit();
-            int coin = prefs.getInt("X2CoinPurchased", 1);
-            editor.putInt("X2CoinPurchased", coin*2);
+            editor.putInt("X2CoinPurchased",multiplier*2);
             editor.apply();
-        } else {
+        } else if (!deducted){
             Log.d(TAG, "Insufficient Coins to deduct for x2 coin upgrade");
+
+        }  else{
+            Log.d(TAG,"X2 is maxed out");
         }
+
     }
 
     private void handleAutoCoinPurchase() {
