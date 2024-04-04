@@ -116,6 +116,9 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
         // Assume the user is no longer actively using the app
         Intent serviceIntent = new Intent(this, ReminderService.class);
         startService(serviceIntent);
+        if(clicker.isContinuousClickActive()){
+            clicker.stopContinuousClicking();
+        }
     }
     @Override
     protected void onStop() {
@@ -123,6 +126,9 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
         Log.d(TAG,"DB is saving on stop event");
         clicker.saveGameProgressToDB(this); // Save game progress
         clicker.stopAutoClick();
+        if(clicker.isContinuousClickActive()){
+            clicker.stopContinuousClicking();
+        }
     }
     @Override
     protected void onDestroy() {
@@ -134,6 +140,9 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
         if (!isChangingConfigurations()) {
             Intent serviceIntent = new Intent(this, ReminderService.class);
             startService(serviceIntent);
+        }
+        if(clicker.isContinuousClickActive()){
+            clicker.stopContinuousClicking();
         }
     }
     @Override
