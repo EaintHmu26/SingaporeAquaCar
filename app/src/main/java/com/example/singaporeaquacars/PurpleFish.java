@@ -6,9 +6,7 @@ import android.graphics.BitmapFactory;
 import java.util.Random;
 
 public class PurpleFish {
-
     private Bitmap[] purpleFish = new Bitmap[5];
-    private int frameDelayCounter = 0; // Counter to control frame update delay
     private final int distancePerFrame = 15; // Distance for each frame change
     private int initialX;
     private int fishX;
@@ -17,7 +15,6 @@ public class PurpleFish {
     protected int fishFrame;
     private int screenWidth, screenHeight;
     private Random random;
-
     public PurpleFish(Context context, int screenWidth, int screenHeight) {
         this.screenWidth = screenWidth; // Store screen dimensions
         this.screenHeight = screenHeight;
@@ -105,11 +102,4 @@ public class PurpleFish {
         return purpleFish[0].getHeight();
     }
 
-    public int getVelocity() {
-        return velocity;
-    }
-
-    public void setVelocity(int velocity) {
-        this.velocity = velocity;
-    }
 }
