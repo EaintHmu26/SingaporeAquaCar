@@ -33,8 +33,10 @@ public class StoreActivity extends Activity {
 
         clicker = new Clicker();
         clicker.loadGameProgressFromDB(this);
-        clicker.setContinuousClickActive(0);
+        clicker.setContinuousClickActive(false);
         int currentCoins = clicker.getTotalCoinsEarned();
+//        Log.d(TAG,"Clicker before upgrade "+clicker.getCurrentCoinsPerClick());
+//        Log.d(TAG,"Coins before upgrade "+currentCoins);
 
         // Update coins display
         coinsTextView = findViewById(R.id.coinsTextView);
@@ -170,6 +172,7 @@ public class StoreActivity extends Activity {
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putBoolean("AutoCoinPurchased", true);
                         editor.apply();
+                        finish();
 
                     }else{
                         Log.d(TAG, "Insufficient Coins to deduct for autoclicker upgrade");
@@ -183,6 +186,7 @@ public class StoreActivity extends Activity {
                     boolean deducted = clicker.deductCoins(30);
                     if(deducted){
                         Log.d(TAG,"Calling the upgrade clicker function");
+                        Log.d(TAG,"Clicker before upgrade "+clicker.getCurrentCoinsPerClick());
                         clicker.upgradeClicker(StoreActivity.this);
                         // Update coins display
                         updateCoinsDisplay(clicker.getTotalCoinsEarned());
