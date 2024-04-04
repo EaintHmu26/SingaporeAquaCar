@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import java.util.Random;
 
 public class Shark {
+    private float speed;
 
     private final Bitmap[] shark = new Bitmap[5];
     private int fishX, fishY, velocity, fishFrame;
@@ -85,6 +86,15 @@ public class Shark {
 
     public int getHeight() {
         return shark[0].getHeight();
+    }
+
+    // Getter and setter for speed
+    public float getSpeed() {
+        return velocity;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = velocity;
     }
 }
 

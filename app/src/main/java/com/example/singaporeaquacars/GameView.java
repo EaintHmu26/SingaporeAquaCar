@@ -18,12 +18,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.os.Handler;
 
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
 
 public class GameView extends View {
-
+    private ScheduledExecutorService executorService;
     Bitmap home_bkgrd_platform, car, scaledBg;
     static int dWidth, dHeight;
     Bitmap storeIcon;
@@ -107,6 +114,28 @@ public class GameView extends View {
         plusOnePaint.setColor(Color.YELLOW);
         plusOnePaint.setTextSize(TEXT_SIZE * 1.5f);
         plusOnePaint.setAntiAlias(true);
+
+        startFishSpeedUpdateTask();
+    }
+
+    private void startFishSpeedUpdateTask() {
+        executorService = Executors.newScheduledThreadPool(1);
+        executorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("GameView", "Updating shark speed"); // Logging for debugging
+
+                for (Shark shark : shark) {
+                    // Randomly adjust the speed of each fish
+                    float newSpeed = 1 + new Random().nextFloat() * (5 - 1); // Example: speed range [1, 5]
+                    shark.setSpeed(newSpeed);
+                    Log.d("GameView", "Fish speed updated: NewSpeed=" + newSpeed);
+                }
+
+                // Make sure to post any UI updates to the main thread
+                postInvalidate();
+            }
+        }, 0, 3, TimeUnit.SECONDS); // Example: adjust every 10 seconds
     }
 
     private void updateCarImage() {
@@ -193,6 +222,8 @@ public class GameView extends View {
 
     // Initialization of Fish Objects
     private void initializeFish() {
+        purpleFish.clear();
+        Log.d("GameView", "Initializing fish");
         for (int i = 0; i < 3; i++) {
             PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
             purpleFish.add(aPurpleFish);
@@ -237,7 +268,7 @@ public class GameView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
-        Log.d("GameView", "onDraw called");
+        //Log.d("GameView", "onDraw called");
 
         if (scaledBg.getWidth() != getWidth() || scaledBg.getHeight() != getHeight()) {
             scaledBg = Bitmap.createScaledBitmap(home_bkgrd_platform, getWidth(), getHeight(), true);
@@ -246,12 +277,14 @@ public class GameView extends View {
         canvas.drawBitmap(scaledBg, 0, 0, null);
 
 
-        Log.d("GameView", "PurpleFish size: " + purpleFish.size());
+        //Log.d("GameView", "PurpleFish size: " + purpleFish.size());
 //        Log.d("GameView", "RobotFish size: " + robotFish.size());
-        Log.d("GameView", "Shark size: " + shark.size());
+        //Log.d("GameView", "Shark size: " + shark.size());
 
         for (PurpleFish fish : purpleFish) {
             fish.update();  // Update position and check for looping
+//            Log.d("GameView", "Drawing fish: X=" + fish.getX() + ", Y=" + fish.getY() + ", Speed=" + fish.getSpeed());
+
             canvas.drawBitmap(fish.getBitmap(), fish.getX(), fish.getY(), null); // Draw fish
         }
         for (Shark sharks : shark) {
