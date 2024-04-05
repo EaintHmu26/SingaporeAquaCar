@@ -1,25 +1,11 @@
 package com.example.singaporeaquacars;
 
 import android.app.Activity;
-import android.content.Context;
+import android.app.AlertDialog;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.singaporeaquacars.Clicker;
-
-import org.w3c.dom.Text;
 
 public class StoreActivity extends Activity {
 
@@ -72,9 +58,11 @@ public class StoreActivity extends Activity {
             editor.apply();
         } else if (!deducted){
             Log.d(TAG, "Insufficient Coins to deduct for x2 coin upgrade");
+            showAlertForInsufficientCoins();
 
         }  else{
             Log.d(TAG,"X2 is maxed out");
+            showAlertForX2MaxedOut();
         }
 
     }
@@ -93,16 +81,18 @@ public class StoreActivity extends Activity {
             editor.putBoolean("AutoCoinPurchased", true);
             editor.apply();
             //??
-            finish();
+//            finish();
 
         }else{
             Log.d(TAG, "Insufficient Coins to deduct for autoclicker upgrade");
+            showAlertForInsufficientCoins();
         }
     }
 
     private void handlePurchase(String item, int cost) {
         if(clicker.getTotalCoinsEarned() < cost) {
             Log.d(TAG, "Insufficient coins for " + item + ".");
+            showAlertForInsufficientCoins();
         }
 
         if (item.equals("Wings 1")) {
@@ -181,268 +171,6 @@ public class StoreActivity extends Activity {
         }
     }
 
-
-
-
-
-
-
-
-
-
-//    private void setPurchaseFlag(String key) {
-//        SharedPreferences prefs = getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
-//        prefs.edit().putBoolean(key, true).apply();
-//    }
-
-
-
-
-//    private LinearLayout createUpgradeSection(int drawableId, String buttonText, int imageSize, int padding) {
-//        LinearLayout layout = new LinearLayout(this);
-//        layout.setOrientation(LinearLayout.VERTICAL);
-//        layout.setGravity(Gravity.CENTER_HORIZONTAL);
-//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.MATCH_PARENT,
-//                LinearLayout.LayoutParams.WRAP_CONTENT
-//        );
-//        layoutParams.setMargins(0, 0, 0, padding); // Add some margin below each section
-//        layout.setLayoutParams(layoutParams);
-//
-//        // Create and set up the ImageView
-//        ImageView imageView = new ImageView(this);
-//        // Set a light gray background color to the ImageView
-//        //imageView.setBackgroundColor(Color.parseColor("#FFCCCCCC"));
-//        imageView.setImageResource(drawableId);
-//        // Set larger dimensions for the ImageView
-//        int imageWidth = (int) (120 * getResources().getDisplayMetrics().density); // 120dp
-//        int imageHeight = (int) (120 * getResources().getDisplayMetrics().density); // 120dp, you can adjust this to keep the aspect ratio if needed
-//        LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(imageWidth, imageHeight);
-//        imageParams.setMargins(0, 0, 0, padding / 2); // Add some margin below the ImageView
-//        imageView.setLayoutParams(imageParams);
-//        layout.addView(imageView);
-//
-//        // Create and set up the Button
-//        Button button = new Button(this);
-//        button.setText(buttonText);
-//        button.setLayoutParams(new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.MATCH_PARENT,
-//                LinearLayout.LayoutParams.WRAP_CONTENT
-//        ));
-//
-//        // Specific logic for car purchase buttons
-//        if (drawableId == R.drawable.car_wings_cheapest ||
-//                drawableId == R.drawable.car_wings_middle ||
-//                drawableId == R.drawable.car_wings_ex ||
-//                drawableId == R.drawable.car_submarine) {
-//            // Car purchase logic
-//            button.setOnClickListener(v -> {
-//                Log.d(TAG, "Attempting to purchase: " + buttonText);
-//                purchaseCar(getCarKeyByDrawableId(drawableId));
-//            });
-//        } else {
-//            // Other upgrade logic (x2 coin, autocoin, etc.)
-//            button.setOnClickListener(v -> {
-//                // Implement logic for non-car upgrades here
-//                handleNonCarUpgrade(drawableId);
-//            });
-//        }
-//
-//        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-//        SharedPreferences.Editor editor = prefs.edit();
-//
-//        // Check if the current button is the autocoin button
-//        if (drawableId == R.drawable.autocoin_icon) {
-//            button.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    // Handle autocoin button click here
-//                    // Call the method specific to autocoin button
-//                    boolean deducted = clicker.deductCoins(50);
-//
-//                    if(deducted){
-//                        Log.d(TAG, "Bought the autoclicker upgrade function");
-//
-//                        // Update coins display
-//                        updateCoinsDisplay(clicker.getTotalCoinsEarned());
-//
-//                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-//                        SharedPreferences.Editor editor = prefs.edit();
-//                        editor.putBoolean("AutoCoinPurchased", true);
-//                        editor.apply();
-//
-//                    }else{
-//                        Log.d(TAG, "Insufficient Coins to deduct for autoclicker upgrade");
-//                    }
-//                }
-//            });
-//        } else if (drawableId == R.drawable.x2_coin_icon){
-//            button.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    boolean deducted = clicker.deductCoins(30);
-//                    if(deducted){
-//                        Log.d(TAG,"Calling the upgrade clicker function");
-//                        clicker.upgradeClicker(StoreActivity.this);
-//                        // Update coins display
-//                        updateCoinsDisplay(clicker.getTotalCoinsEarned());
-//
-//                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-//                        SharedPreferences.Editor editor = prefs.edit();
-//
-//                        editor.putBoolean("X2CoinPurchased", true);
-//
-//                        editor.apply();
-//                    }else{
-//                        Log.d(TAG, "Insufficient Coins to deduct for x2 coin upgrade");
-//                    }
-//                }
-//            });
-//
-//        } else if (drawableId == R.drawable.car_wings_cheapest){
-//            button.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//
-//                    int cost = 1000;
-//                    if (clicker.getTotalCoinsEarned() >= cost) {
-//                        updateCoinsDisplay(clicker.getTotalCoinsEarned() - cost);
-//
-//                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-//                        SharedPreferences.Editor editor = prefs.edit();
-//                        editor.putBoolean("CarWingsMiddlePurchased", false);
-//                        editor.putBoolean("CarWingsExPurchased", false);
-//                        editor.putBoolean("CarSubmarinePurchased", false);
-//                        editor.putBoolean("CarWingsCheapestPurchased", true);
-//                        editor.apply();
-//
-//                        clicker.saveGameProgressToDB(StoreActivity.this);
-//                    }
-//                    clicker.upgradeClicker(StoreActivity.this);
-//                    System.out.println("Calling the upgrade clicker function");
-//                    // Update coins display
-//                    clicker.saveGameProgressToDB(StoreActivity.this);
-//                }
-//            });
-//
-//        } else if (drawableId == R.drawable.car_wings_middle){
-//            button.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//
-//                    int cost = 1500;
-//                    if (clicker.getTotalCoinsEarned() >= cost) {
-//                        updateCoinsDisplay(clicker.getTotalCoinsEarned() - cost);
-//
-//                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-//                        SharedPreferences.Editor editor = prefs.edit();
-//                        editor.putBoolean("CarWingsMiddlePurchased", true);
-//                        editor.putBoolean("CarWingsExPurchased", false);
-//                        editor.putBoolean("CarSubmarinePurchased", false);
-//                        editor.putBoolean("CarWingsCheapestPurchased", false);
-//                        editor.apply();
-//
-//                        clicker.saveGameProgressToDB(StoreActivity.this);
-//                    }
-//                    clicker.upgradeClicker(StoreActivity.this);
-//                    System.out.println("Calling the upgrade clicker function");
-//                    // Update coins display
-//                    clicker.saveGameProgressToDB(StoreActivity.this);
-//                }
-//            });
-//
-//        } else if (drawableId == R.drawable.car_wings_ex){
-//            button.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    int cost = 2000;
-//                    if (clicker.getTotalCoinsEarned() >= cost) {
-//                        updateCoinsDisplay(clicker.getTotalCoinsEarned() - cost);
-//
-//                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-//                        SharedPreferences.Editor editor = prefs.edit();
-//                        editor.putBoolean("CarWingsMiddlePurchased", false);
-//                        editor.putBoolean("CarWingsExPurchased", true);
-//                        editor.putBoolean("CarSubmarinePurchased", false);
-//                        editor.putBoolean("CarWingsCheapestPurchased", false);
-//                        editor.apply();
-//
-//                        clicker.saveGameProgressToDB(StoreActivity.this);
-//                    }
-//                    clicker.upgradeClicker(StoreActivity.this);
-//                    System.out.println("Calling the upgrade clicker function");
-//                    // Update coins display
-//                    clicker.saveGameProgressToDB(StoreActivity.this);
-//                }
-//            });
-//
-//        } else if (drawableId == R.drawable.car_submarine){
-//            button.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    int cost = 3000;
-//                    if (clicker.getTotalCoinsEarned() >= cost) {
-//                        updateCoinsDisplay(clicker.getTotalCoinsEarned() - cost);
-//
-//                        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-//                        SharedPreferences.Editor editor = prefs.edit();
-//                        editor.putBoolean("CarWingsMiddlePurchased", false);
-//                        editor.putBoolean("CarWingsExPurchased", false);
-//                        editor.putBoolean("CarSubmarinePurchased", true);
-//                        editor.putBoolean("CarWingsCheapestPurchased", false);
-//                        editor.apply();
-//
-//                        clicker.saveGameProgressToDB(StoreActivity.this);
-//                    }
-//                    clicker.upgradeClicker(StoreActivity.this);
-//                    System.out.println("Calling the upgrade clicker function");
-//                    // Update coins display
-//                    clicker.saveGameProgressToDB(StoreActivity.this);
-//                }
-//            });
-//
-//        }
-//
-//        layout.addView(button);
-//
-//        return layout;
-//    }
-
-//    private String getCarKeyByDrawableId(int drawableId) {
-//        if (drawableId == R.drawable.car_wings_cheapest) {
-//            return "CarWingsCheapestPurchased";
-//        } else if (drawableId == R.drawable.car_wings_middle) {
-//            return "CarWingsMiddlePurchased";
-//        } else if (drawableId == R.drawable.car_wings_ex) {
-//            return "CarWingsExPurchased";
-//        } else if (drawableId == R.drawable.car_submarine) {
-//            return "CarSubmarinePurchased";
-//        } else {
-//            return "";
-//        }
-//    }
-
-//    private void purchaseCar(String purchasedCarKey) {
-//        SharedPreferences prefs = getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = prefs.edit();
-//
-//        // Set the selected car as purchased
-//        editor.putBoolean(purchasedCarKey, true);
-//        editor.apply();
-//
-//        Log.d(TAG, purchasedCarKey + " now set to purchased");
-//
-//        // Optional: Save game progress or update UI as needed
-//        updateCoinsDisplay(clicker.getTotalCoinsEarned());
-//        clicker.saveGameProgressToDB(this);
-//    }
-
-//    private void handleNonCarUpgrade(int drawableId) {
-//        // This method should contain the logic for handling non-car upgrades
-//        // For example, handling autocoin or x2 coin purchase
-//        // Remember to save any changes to SharedPreferences and update necessary UI elements
-//    }
-
     public void updateCoinsDisplay(int coins) {
         // Update the TextView to show the current number of coins
         coinsTextView.setText("Coins: " + coins);
@@ -469,6 +197,24 @@ public class StoreActivity extends Activity {
 
     private void saveGameProgress() {
         clicker.saveGameProgressToDB(this);
+    }
+
+    private void showAlertForInsufficientCoins() {
+        new AlertDialog.Builder(this)
+                .setTitle("Insufficient Coins")
+                .setMessage("You do not have enough coins to make this purchase.")
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    private void showAlertForX2MaxedOut() {
+        new AlertDialog.Builder(this)
+                .setTitle("X2 Maxed Out")
+                .setMessage("You have reached the limit for this upgrade.")
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss())
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     @Override
