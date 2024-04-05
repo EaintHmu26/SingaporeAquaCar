@@ -81,7 +81,7 @@ public class StoreActivity extends Activity {
             editor.putBoolean("AutoCoinPurchased", true);
             editor.apply();
             //??
-//            finish();
+            finish();
 
         }else{
             Log.d(TAG, "Insufficient Coins to deduct for autoclicker upgrade");
