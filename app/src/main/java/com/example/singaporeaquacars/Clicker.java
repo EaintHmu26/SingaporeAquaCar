@@ -22,6 +22,8 @@ public class Clicker {
     private boolean continuousClickActive = false;
     private Runnable continuousClickRunnable;
     private ClickerUpdateListener updateListener;
+    private final Object lock = new Object();
+    private volatile boolean pauseAutoClicker = false;
 
     public Clicker() {
         currentCoinsPerClick = 1; // Initial value
@@ -33,7 +35,7 @@ public class Clicker {
         autoClickRunnable = new Runnable() {
             @Override
             public void run() {
-                handleClick(); // Automatically click every 15 seconds
+                handleAutoClick(); // Automatically click every 15 seconds
 
                 if (updateListener != null) {
                     // Use the main thread to inform the UI
@@ -57,19 +59,31 @@ public class Clicker {
     }
 
     public void handleClick() {
-        int total = totalCoinsEarned + currentCoinsPerClick;
-        if(total >1000000){
-            Log.d(TAG,"Coins stopped accumulating");
-            if (updateListener != null) {
-                new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(1000000));
-            };
-        }else{
-            totalCoinsEarned = total;
-            if (updateListener != null) {
-                new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(totalCoinsEarned));
-            };
-            Log.d(TAG, "Clicker clicking at: " + currentCoinsPerClick);
-            Log.d(TAG, "Clicking updated: " + totalCoinsEarned);
+        synchronized (lock){
+            int total = totalCoinsEarned + currentCoinsPerClick;
+            if(total >1000000){
+                Log.d(TAG,"Coins stopped accumulating");
+                if (updateListener != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(1000000));
+                };
+            }else{
+                totalCoinsEarned = total;
+                if (updateListener != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(totalCoinsEarned));
+                };
+                Log.d(TAG, "Clicker clicking at: " + currentCoinsPerClick);
+                Log.d(TAG, "Clicking updated: " + totalCoinsEarned);
+            }
+        }
+    }
+
+    private void handleAutoClick(){
+        synchronized (lock){
+            if(!pauseAutoClicker){
+                handleClick();
+            }else{
+                Log.d(TAG,"auto click is paused");
+            }
         }
     }
 
@@ -109,21 +123,27 @@ public class Clicker {
     }
 
     public void activateContinuousAutoClickUpgrade(Context context) {
-        if (!continuousClickActive) {
-            Log.d(TAG,"starting autoclicker");
-            continuousClickActive = true;
-            autoClickHandler.postDelayed(continuousClickRunnable, 1000); // Start immediately
+        synchronized (lock){
+            if (!continuousClickActive) {
+                Log.d(TAG,"starting autoclicker");
+                continuousClickActive = true;
+                pauseAutoClicker = true;
+                autoClickHandler.postDelayed(continuousClickRunnable, 1000); // Start immediately
 
-            // Schedule deactivation of continuous clicking after 30 seconds
-            autoClickHandler.postDelayed(this::stopContinuousClicking, AUTO_CLICK_DURATION);
+                // Schedule deactivation of continuous clicking after 30 seconds
+                autoClickHandler.postDelayed(this::stopContinuousClicking, AUTO_CLICK_DURATION);
+            }
         }
     }
 
     public void stopContinuousClicking() {
-        if (continuousClickActive) {
-            System.out.println("Stopping autoclicker upgrade");
-            autoClickHandler.removeCallbacks(continuousClickRunnable);
-            continuousClickActive = false;
+        synchronized (lock){
+            if (continuousClickActive) {
+                System.out.println("Stopping autoclicker upgrade");
+                autoClickHandler.removeCallbacks(continuousClickRunnable);
+                continuousClickActive = false;
+                pauseAutoClicker = false;
+            }
         }
     }
 
