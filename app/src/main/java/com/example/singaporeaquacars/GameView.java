@@ -120,13 +120,13 @@ public class GameView extends View {
         executorService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                Log.d("GameView", "Updating shark speed"); // Logging for debugging
+                //Log.d("GameView", "Updating shark speed"); // Logging for debugging
 
                 for (Shark shark : shark) {
                     // Randomly adjust the speed of each fish
                     float newSpeed = 1 + new Random().nextFloat() * (5 - 1); // Example: speed range [1, 5]
                     shark.setSpeed(newSpeed);
-                    Log.d("GameView", "Fish speed updated: NewSpeed=" + newSpeed);
+                    //Log.d("GameView", "Fish speed updated: NewSpeed=" + newSpeed);
                 }
 
                 // Make sure to post any UI updates to the main thread
