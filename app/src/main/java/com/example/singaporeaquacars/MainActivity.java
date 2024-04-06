@@ -10,17 +10,19 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 public class MainActivity extends AppCompatActivity implements GameView.OnCoinCountChangeListener, Clicker.ClickerUpdateListener {
 
     private static final String TAG = "Main";
     private Clicker clicker;
-//    private TextView coinsTextView;
     public static final String EXTRA_SHOW_NOTIFICATION_PERMISSION = "extra_notification";
     private static final String CHANNEL_ID = "game_notification_channel";
     private GameView gameView;
@@ -29,34 +31,31 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE); // Hide the title
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN); // Enable full screen
         clicker = new Clicker();
         clicker.setUpdateListener(this);
         clicker.loadGameProgressFromDB(this);
         clicker.startAutoClick();
 
-        LinearLayout rootLayout = new LinearLayout(this);
-        rootLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT));
-        rootLayout.setOrientation(LinearLayout.VERTICAL);
-
-//        coinsTextView = new TextView(this);
-//        coinsTextView.setLayoutParams(new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.WRAP_CONTENT,
-//                LinearLayout.LayoutParams.WRAP_CONTENT));
-//        rootLayout.addView(coinsTextView);
-
+        // Set ContentView to the game view directly or use a layout that includes the GameView
         gameView = new GameView(this);
+        setContentView(gameView); // Set the GameView as the content of MainActivity
         gameView.setOnCoinCountChangeListener(this);
 
-        LinearLayout.LayoutParams gameViewParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0, 1.0f);
-        gameView.setLayoutParams(gameViewParams);
-        rootLayout.addView(gameView);
+        // Ensure the content view extends beneath system bars and control immersive mode
+        WindowInsetsControllerCompat windowInsetsController =
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars()); // Hide system bars
+        windowInsetsController.setSystemBarsBehavior(
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
-        setContentView(rootLayout);
         createNotificationChannel();
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false); // Ensure views layout under system bars
+
+        // This line will keep the screen on while the activity is in view
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
@@ -67,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     }
 
     private void loadCoinCount() {
-        SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
         int coinCount = clicker.getTotalCoinsEarned();//prefs.getInt("TotalCoins", 0); // 0 is a default value in case there's nothing saved yet
         onUpdateCoins(coinCount); // Make sure to implement this method to update the UI accordingly
     }
@@ -80,8 +78,7 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
         clicker.startAutoClick();
         gameView.refreshPurchasedItems();
         loadCoinCount();
-//        updateCoinsTextView(clicker.getTotalCoinsEarned());
-      
+
         // Cancel any set alarms as the user is back
         Intent notificationIntent = new Intent(this, ReminderBroadcast.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -151,10 +148,6 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
             gameView.setCoinCount(totalCoins); // Update GameView's coin count
         }
     }
-
-//    private void updateCoinsTextView(int totalCoins) {
-//        coinsTextView.setText("Coins: $" + totalCoins); // This sets the text you want to show
-//    }
 
     private void createNotificationChannel() {
         CharSequence name = getString(R.string.channel_name);

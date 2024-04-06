@@ -18,19 +18,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.os.Handler;
 
-
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-
+import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
-
-import java.util.ArrayList;
-import java.util.concurrent.Executors;
 
 public class GameView extends View {
     private ScheduledExecutorService executorService;
@@ -53,11 +47,7 @@ public class GameView extends View {
     Paint plusOnePaint;
     private OnCoinCountChangeListener coinCountChangeListener;
     private static final int REQUEST_CODE_STORE = 1;
-
     private Clicker clicker;
-
-
-
 
     public GameView(Context context){
         super(context);
@@ -82,10 +72,11 @@ public class GameView extends View {
         display.getSize(size);
         dWidth = size.x;
         dHeight = size.y;
+
         scaledBg = Bitmap.createScaledBitmap(home_bkgrd_platform, dWidth, dHeight, true);
 
         purpleFish = new ArrayList<>();
-        shark = new ArrayList<Shark>();
+        shark = new ArrayList<>();
         initializeFish();
 
         loadPurchasedItems();
@@ -112,11 +103,6 @@ public class GameView extends View {
         carWidth = 4 * dWidth / 5;
         carHeight = (int) (carWidth * aspectRatio);
         car = Bitmap.createScaledBitmap(car, carWidth, carHeight, false);
-
-        coinCountPaint = new Paint();
-        coinCountPaint.setColor(Color.WHITE);
-        coinCountPaint.setTextSize(TEXT_SIZE);
-        coinCountPaint.setAntiAlias(true);
 
         prefs = context.getSharedPreferences("gameData", Context.MODE_PRIVATE);
         coinCount = prefs.getInt("coinCount", 0);
@@ -217,20 +203,6 @@ public class GameView extends View {
         postInvalidate(); // Redraw the view with the updated coin count
     }
 
-    // Load bitmap with error checking
-    private Bitmap loadBitmapSafe(int resId) {
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resId);
-        if (bitmap == null) {
-            Log.e("GameView", "Error loading bitmap resource ID: " + resId);
-        }
-        return bitmap;
-    }
-
-    // Efficient bitmap scaling
-    private Bitmap scaleBitmap(Bitmap bitmap, int width, int height) {
-        return bitmap != null ? Bitmap.createScaledBitmap(bitmap, width, height, true) : null;
-    }
-
     // Initialization of Fish Objects
     private void initializeFish() {
         purpleFish.clear();
@@ -239,13 +211,11 @@ public class GameView extends View {
             PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
             purpleFish.add(aPurpleFish);
             //Log.d("GameView", "PurpleFish added");
-
         }
         //i just want to add one shark
         Shark ashark = new Shark(context, dWidth, dHeight);
         shark.add(ashark);
         //Log.d("GameView", "shark added");
-
     }
 
     private void startPlusOneAnimation() {
@@ -276,6 +246,7 @@ public class GameView extends View {
         animationHandler.post(animationRunnable);
     }
 
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
@@ -287,15 +258,8 @@ public class GameView extends View {
 
         canvas.drawBitmap(scaledBg, 0, 0, null);
 
-
-        //Log.d("GameView", "PurpleFish size: " + purpleFish.size());
-//        Log.d("GameView", "RobotFish size: " + robotFish.size());
-        //Log.d("GameView", "Shark size: " + shark.size());
-
         for (PurpleFish fish : purpleFish) {
             fish.update();  // Update position and check for looping
-//            Log.d("GameView", "Drawing fish: X=" + fish.getX() + ", Y=" + fish.getY() + ", Speed=" + fish.getSpeed());
-
             canvas.drawBitmap(fish.getBitmap(), fish.getX(), fish.getY(), null); // Draw fish
         }
         for (Shark sharks : shark) {
@@ -319,8 +283,21 @@ public class GameView extends View {
         canvas.drawBitmap(storeIcon, iconX, iconY, null);
 
         // Display the coin count
-        canvas.drawText("Coins: $" + coinCount, 20, TEXT_SIZE + 20, coinCountPaint);
-    }
+        int textSize = TEXT_SIZE + 8;
+
+        coinCountPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        coinCountPaint.setColor(Color.WHITE);
+        coinCountPaint.setTextSize(textSize);
+        coinCountPaint.setAntiAlias(true);
+
+        Paint outlinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        outlinePaint.setTextSize(textSize);
+        outlinePaint.setColor(Color.BLACK);
+        outlinePaint.setStyle(Paint.Style.STROKE);
+        outlinePaint.setStrokeWidth(20);
+
+        canvas.drawText("Coins: $" + coinCount, 20, textSize + 20, outlinePaint);
+        canvas.drawText("Coins: $" + coinCount, 20, textSize + 20, coinCountPaint);    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
