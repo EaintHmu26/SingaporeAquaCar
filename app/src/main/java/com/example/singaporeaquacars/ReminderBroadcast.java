@@ -25,7 +25,7 @@ public class ReminderBroadcast extends BroadcastReceiver {
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setContentTitle("Game Reminder")
                 .setContentText("Are you there? Your car needs some love!")
-                .setPriority(NotificationCompat.PRIORITY_HIGH) // Set the priority to high
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
@@ -45,7 +45,6 @@ public class ReminderBroadcast extends BroadcastReceiver {
             Log.d(TAG, "Notification sent.");
         } else {
             Log.d(TAG, "Notification permission NOT granted. Cannot send notification.");
-            // Existing handling code for lack of permission...
         }
     }
 

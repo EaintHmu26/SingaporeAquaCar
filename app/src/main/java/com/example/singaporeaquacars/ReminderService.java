@@ -14,8 +14,8 @@ public class ReminderService extends Service {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        long triggerAfter = 30000; // 30s
-        long triggerEvery = 30000; // 30s
+        long triggerAfter = 59000; // 59s
+        long triggerEvery = 59000; // 59s
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + triggerAfter, triggerEvery, pendingIntent);
 
