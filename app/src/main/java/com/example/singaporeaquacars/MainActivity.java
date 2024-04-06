@@ -23,9 +23,8 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
 
     private static final String TAG = "Main";
     private Clicker clicker;
-    public static final String EXTRA_SHOW_NOTIFICATION_PERMISSION = "extra_notification";
-    private static final String CHANNEL_ID = "game_notification_channel";
     private GameView gameView;
+    private static final String CHANNEL_ID = "game_notification_channel";
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -78,20 +77,6 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
         clicker.startAutoClick();
         gameView.refreshPurchasedItems();
         loadCoinCount();
-
-        // Cancel any set alarms as the user is back
-        Intent notificationIntent = new Intent(this, ReminderBroadcast.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.cancel(pendingIntent);
-
-        if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-            intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
-            startActivity(intent);
-        }
-
         SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
         boolean autoCoinPurchased = prefs.getBoolean("AutoCoinPurchased", false);
 
@@ -110,9 +95,6 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
         Log.d(TAG,"DB is saving on pause event");
         clicker.saveGameProgressToDB(this);
         clicker.stopAutoClick();
-        // Assume the user is no longer actively using the app
-        Intent serviceIntent = new Intent(this, ReminderService.class);
-        startService(serviceIntent);
         if(clicker.isContinuousClickActive()){
             clicker.stopContinuousClicking();
         }
@@ -133,11 +115,6 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
         Log.d(TAG,"DB is saving on destroy event");
         clicker.saveGameProgressToDB(this); // Attempt to save game progress
         clicker.stopAutoClick();
-        // Check if the app is not switching between configurations
-        if (!isChangingConfigurations()) {
-            Intent serviceIntent = new Intent(this, ReminderService.class);
-            startService(serviceIntent);
-        }
         if(clicker.isContinuousClickActive()){
             clicker.stopContinuousClicking();
         }
