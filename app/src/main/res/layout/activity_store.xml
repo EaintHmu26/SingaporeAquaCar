@@ -1,43 +1,3 @@
-<!--&lt;!&ndash; activity_store.xml &ndash;&gt;-->
-<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:tools="http://schemas.android.com/tools"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"-->
-<!--    tools:context=".StoreActivity">-->
-
-<!--    <ImageView-->
-<!--        android:id="@+id/backgroundImageView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:scaleType="centerCrop"-->
-<!--        android:src="@drawable/store_background" />-->
-
-<!--    <ScrollView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent">-->
-
-<!--        <LinearLayout-->
-<!--            android:id="@+id/mainLayout"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="vertical"-->
-<!--            android:padding="16dp">-->
-
-<!--            <TextView-->
-<!--                android:id="@+id/coinsTextView"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="center_horizontal"-->
-<!--                android:textColor="#FFFFFF"-->
-<!--                android:textSize="20sp" />-->
-
-
-
-<!--        </LinearLayout>-->
-<!--    </ScrollView>-->
-<!--</FrameLayout>-->
-
-
 
 <!-- activity_store.xml -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -71,7 +31,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp"
+                android:shadowColor="#000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1.5"
+                android:textStyle="bold"
+                />
 
             <!-- x2 Coin Upgrade -->
             <ImageView
@@ -114,8 +80,8 @@
 
             <!-- Wings 1 Upgrade -->
             <ImageView
-                android:layout_width="250dp"
-                android:layout_height="250dp"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
                 android:src="@drawable/car_wings_cheapest"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"
@@ -133,8 +99,8 @@
 
             <!-- Wings 2 Upgrade -->
             <ImageView
-                android:layout_width="250dp"
-                android:layout_height="250dp"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
                 android:src="@drawable/car_wings_middle"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"
@@ -153,8 +119,8 @@
 
             <!-- Wings 3 Upgrade -->
             <ImageView
-                android:layout_width="250dp"
-                android:layout_height="250dp"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
                 android:src="@drawable/car_wings_ex"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"
@@ -173,8 +139,8 @@
 
             <!-- Submarine Upgrade -->
             <ImageView
-                android:layout_width="250dp"
-                android:layout_height="250dp"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
                 android:src="@drawable/car_submarine"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"
