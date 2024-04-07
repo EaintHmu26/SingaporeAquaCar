@@ -32,11 +32,7 @@ public class ReminderBroadcast extends BroadcastReceiver {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
             notificationManager.notify(200, builder.build());
-        }  // The permission is not granted.
-        // Since a BroadcastReceiver cannot request permissions, you would need to handle this case.
-        // Options include showing a notification to explain the need for the permission,
-        // or starting an Activity with a new Task to request the permission.
-
+        }
         //troubleshoot
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Notification permission granted. Sending notification.");
