@@ -120,7 +120,7 @@ public class GameView extends View {
             @Override
             public void run() {
                 for (Shark shark : shark) {
-                    // Randomly adjust the speed of each fish
+                    // shark with random speed
                     float newSpeed = 1 + new Random().nextFloat() * (5 - 1);
                     shark.setSpeed(newSpeed);
                 }
