@@ -32,16 +32,14 @@
             android:name=".StoreActivity"
             android:exported="true"
             android:theme="@style/Theme.SingaporeAquaCars.Fullscreen">
-            <!-- No intent-filter needed unless you want this Activity to be an entry point -->
         </activity>
         <service
             android:name=".ReminderService"
-            android:exported="false"> <!-- Consider if your service needs to be exported or not -->
+            android:exported="false">
         </service>
         <receiver
             android:name=".ReminderBroadcast"
-            android:exported="false"> <!-- Receivers targeting API 31+ need the exported flag set explicitly -->
-            <!-- If this receiver is meant to receive implicit broadcasts, set exported to true -->
+            android:exported="false">
         </receiver>
     </application>
 
