@@ -1,27 +1,20 @@
 package com.example.singaporeaquacars;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 public class MainActivity extends AppCompatActivity implements GameView.OnCoinCountChangeListener, Clicker.ClickerUpdateListener {
 
-    private static final String TAG = "Main";
     private Clicker clicker;
     private GameView gameView;
     private static final String CHANNEL_ID = "game_notification_channel";
@@ -73,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     protected void onResume() {
         super.onResume();
         clicker.loadGameProgressFromDB(this); // Refresh game progress
-        Log.d(TAG, "clicker coins per click" + clicker.getCurrentCoinsPerClick());
         clicker.startAutoClick();
         gameView.refreshPurchasedItems();
         loadCoinCount();
@@ -82,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
 
         if (autoCoinPurchased) {
             // Activate auto-clicker if not already active
-            clicker.activateContinuousAutoClickUpgrade(this);
+            clicker.activateContinuousAutoClickUpgrade();
             // Reset the flag
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("AutoCoinPurchased", false);
@@ -92,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG,"DB is saving on pause event");
         clicker.saveGameProgressToDB(this);
         clicker.stopAutoClick();
         if(clicker.isContinuousClickActive()){
@@ -102,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG,"DB is saving on stop event");
         clicker.saveGameProgressToDB(this); // Save game progress
         clicker.stopAutoClick();
         if(clicker.isContinuousClickActive()){
@@ -112,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(TAG,"DB is saving on destroy event");
         clicker.saveGameProgressToDB(this); // Attempt to save game progress
         clicker.stopAutoClick();
         if(clicker.isContinuousClickActive()){
