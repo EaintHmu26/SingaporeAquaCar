@@ -23,20 +23,20 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE); // Hide the title
+        // hide the title
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        // enable full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN); // Enable full screen
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         clicker = new Clicker();
         clicker.setUpdateListener(this);
         clicker.loadGameProgressFromDB(this);
         clicker.startAutoClick();
 
-        // Set ContentView to the game view directly or use a layout that includes the GameView
         gameView = new GameView(this);
-        setContentView(gameView); // Set the GameView as the content of MainActivity
+        setContentView(gameView);
         gameView.setOnCoinCountChangeListener(this);
 
-        // Ensure the content view extends beneath system bars and control immersive mode
         WindowInsetsControllerCompat windowInsetsController =
                 WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars()); // Hide system bars
@@ -44,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
 
         createNotificationChannel();
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false); // Ensure views layout under system bars
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
-        // This line will keep the screen on while the activity is in view
+        // to keep the screen on as long as the game is running
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
@@ -54,18 +54,19 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
     public void onCoinCountChanged(int newCoinCount) {
         clicker.setTotalCoinsEarned(newCoinCount);
         clicker.saveGameProgressToDB(this);
-//        updateCoinsTextView(newCoinCount);
     }
 
     private void loadCoinCount() {
-        int coinCount = clicker.getTotalCoinsEarned();//prefs.getInt("TotalCoins", 0); // 0 is a default value in case there's nothing saved yet
-        onUpdateCoins(coinCount); // Make sure to implement this method to update the UI accordingly
+        int coinCount = clicker.getTotalCoinsEarned();
+        onUpdateCoins(coinCount);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         clicker.loadGameProgressFromDB(this); // Refresh game progress
+
         clicker.startAutoClick();
         gameView.refreshPurchasedItems();
         loadCoinCount();
@@ -73,14 +74,17 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
         boolean autoCoinPurchased = prefs.getBoolean("AutoCoinPurchased", false);
 
         if (autoCoinPurchased) {
+
             // Activate auto-clicker if not already active
             clicker.activateContinuousAutoClickUpgrade();
             // Reset the flag
+
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("AutoCoinPurchased", false);
             editor.apply();
         }
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -90,28 +94,35 @@ public class MainActivity extends AppCompatActivity implements GameView.OnCoinCo
             clicker.stopContinuousClicking();
         }
     }
+
     @Override
     protected void onStop() {
         super.onStop();
+
         clicker.saveGameProgressToDB(this); // Save game progress
+
         clicker.stopAutoClick();
         if(clicker.isContinuousClickActive()){
             clicker.stopContinuousClicking();
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         clicker.saveGameProgressToDB(this); // Attempt to save game progress
+
         clicker.stopAutoClick();
         if(clicker.isContinuousClickActive()){
             clicker.stopContinuousClicking();
         }
     }
+
     @Override
     public void onUpdateCoins(int totalCoins) {
         if (gameView != null) {
-            gameView.setCoinCount(totalCoins); // Update GameView's coin count
+            gameView.setCoinCount(totalCoins);
         }
     }
 
