@@ -7,10 +7,8 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 public class Clicker {
-    private static final String TAG = "Clicker";
     private int currentCoinsPerClick;
     private int totalCoinsEarned;
     private HandlerThread handlerThread;
@@ -62,7 +60,6 @@ public class Clicker {
         synchronized (lock){
             int total = totalCoinsEarned + currentCoinsPerClick;
             if(total >1000000){
-                Log.d(TAG,"Coins stopped accumulating");
                 if (updateListener != null) {
                     new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(1000000));
                 };
@@ -71,8 +68,6 @@ public class Clicker {
                 if (updateListener != null) {
                     new Handler(Looper.getMainLooper()).post(() -> updateListener.onUpdateCoins(totalCoinsEarned));
                 };
-                Log.d(TAG, "Clicker clicking at: " + currentCoinsPerClick);
-                Log.d(TAG, "Clicking updated: " + totalCoinsEarned);
             }
         }
     }
@@ -81,26 +76,20 @@ public class Clicker {
         synchronized (lock){
             if(!pauseAutoClicker){
                 handleClick();
-            }else{
-                Log.d(TAG,"auto click is paused");
             }
         }
     }
 
-    public void upgradeClicker(Context context) {
+    public void upgradeClicker() {
             if(currentCoinsPerClick < 2048){
                 // Double the current coins per click when upgrading
-                Log.d(TAG, "before upgrade clicker "+currentCoinsPerClick);
                 currentCoinsPerClick *= 2;
-                Log.d(TAG, "Upgraded Clicker " + currentCoinsPerClick);
             }else{
-                Log.d(TAG, "Maximum upgrade attained");
                 totalCoinsEarned+=30;
             }
     }
 
     public boolean deductCoins(int amount){
-        Log.d(TAG, "Attempting to deduct coins");
         boolean deduct = false;
         if (totalCoinsEarned >= amount) {
             // Deduct the upgrade cost from the total coins earned
@@ -122,10 +111,9 @@ public class Clicker {
         void onUpdateCoins(int totalCoins);
     }
 
-    public void activateContinuousAutoClickUpgrade(Context context) {
+    public void activateContinuousAutoClickUpgrade() {
         synchronized (lock){
             if (!continuousClickActive) {
-                Log.d(TAG,"starting autoclicker");
                 continuousClickActive = true;
                 pauseAutoClicker = true;
                 autoClickHandler.postDelayed(continuousClickRunnable, 1000); // Start immediately
@@ -139,7 +127,6 @@ public class Clicker {
     public void stopContinuousClicking() {
         synchronized (lock){
             if (continuousClickActive) {
-                System.out.println("Stopping autoclicker upgrade");
                 autoClickHandler.removeCallbacks(continuousClickRunnable);
                 continuousClickActive = false;
                 pauseAutoClicker = false;
@@ -160,9 +147,6 @@ public class Clicker {
         return currentCoinsPerClick;
     }
 
-    public void setCurrentCoinsPerClick(int currentCoinsPerClick) {
-        this.currentCoinsPerClick = currentCoinsPerClick;
-    }
     public void setUpdateListener(ClickerUpdateListener updateListener) {
         this.updateListener = updateListener;
     }

@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 public class StoreActivity extends Activity {
 
-    private static final String TAG = "StoreActivity";
     private Clicker clicker;
     private TextView coinsTextView;
 
@@ -46,9 +44,7 @@ public class StoreActivity extends Activity {
 
         boolean deducted = clicker.deductCoins(30);
         if (deducted && multiplier < 2048) {
-            Log.d(TAG,"Calling the upgrade clicker function");
-            Log.d(TAG,"Clicker before upgrade "+clicker.getCurrentCoinsPerClick());
-            clicker.upgradeClicker(StoreActivity.this);
+            clicker.upgradeClicker();
             // update coins display
             updateCoinsDisplay(clicker.getTotalCoinsEarned());
 
@@ -56,11 +52,9 @@ public class StoreActivity extends Activity {
             editor.putInt("X2CoinPurchased",multiplier*2);
             editor.apply();
         } else if (!deducted){
-            Log.d(TAG, "Insufficient Coins to deduct for x2 coin upgrade");
             showAlertForInsufficientCoins();
 
         }  else{
-            Log.d(TAG,"X2 is maxed out");
             showAlertForX2MaxedOut();
         }
 
@@ -70,7 +64,6 @@ public class StoreActivity extends Activity {
         boolean deducted = clicker.deductCoins(50);
 
         if(deducted){
-            Log.d(TAG, "Bought the autoclicker upgrade function");
 
             updateCoinsDisplay(clicker.getTotalCoinsEarned());
 
@@ -78,18 +71,15 @@ public class StoreActivity extends Activity {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("AutoCoinPurchased", true);
             editor.apply();
-            //??
             finish();
 
         }else{
-            Log.d(TAG, "Insufficient Coins to deduct for autoclicker upgrade");
             showAlertForInsufficientCoins();
         }
     }
 
     private void handlePurchase(String item, int cost) {
         if(clicker.getTotalCoinsEarned() < cost) {
-            Log.d(TAG, "Insufficient coins for " + item + ".");
             showAlertForInsufficientCoins();
         }
 
@@ -107,8 +97,8 @@ public class StoreActivity extends Activity {
 
                 clicker.saveGameProgressToDB(StoreActivity.this);
             }
-            clicker.upgradeClicker(StoreActivity.this);
-            System.out.println("Calling the upgrade clicker function");
+            clicker.upgradeClicker();
+            // Update coins display
 
             clicker.saveGameProgressToDB(StoreActivity.this);
         } else if (item.equals("Wings 2")) {
@@ -126,8 +116,9 @@ public class StoreActivity extends Activity {
 
                 clicker.saveGameProgressToDB(StoreActivity.this);
             }
-            clicker.upgradeClicker(StoreActivity.this);
-            System.out.println("Calling the upgrade clicker function");
+
+            clicker.upgradeClicker();
+            // Update coins display
 
             clicker.saveGameProgressToDB(StoreActivity.this);
         } else if (item.equals("Wings 3")) {
@@ -144,8 +135,9 @@ public class StoreActivity extends Activity {
 
                 clicker.saveGameProgressToDB(StoreActivity.this);
             }
-            clicker.upgradeClicker(StoreActivity.this);
-            System.out.println("Calling the upgrade clicker function");
+
+            clicker.upgradeClicker();
+            // Update coins display
 
             clicker.saveGameProgressToDB(StoreActivity.this);
         } else{
@@ -162,8 +154,9 @@ public class StoreActivity extends Activity {
 
                 clicker.saveGameProgressToDB(StoreActivity.this);
             }
-            clicker.upgradeClicker(StoreActivity.this);
-            System.out.println("Calling the upgrade clicker function");
+
+            clicker.upgradeClicker();
+            // Update coins display
 
             clicker.saveGameProgressToDB(StoreActivity.this);
         }
@@ -210,7 +203,6 @@ public class StoreActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d(TAG, "Saving Game Progress");
         saveGameProgress();
     }
 }
