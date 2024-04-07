@@ -28,8 +28,6 @@ public class StoreActivity extends Activity {
         updateCoinsDisplay(currentCoins);
 
         setUpButtonListeners();
-
-
     }
 
     private void setUpButtonListeners() {
@@ -41,6 +39,7 @@ public class StoreActivity extends Activity {
         findViewById(R.id.upgrade_submarine).setOnClickListener(v -> handlePurchase("Submarine", 3000));
         findViewById(R.id.backButton).setOnClickListener(v -> onBackPressed());
     }
+
     private void handleX2CoinPurchase() {
         SharedPreferences prefs = getPreferences();
         int multiplier = prefs.getInt("X2CoinPurchased",1);
@@ -73,7 +72,6 @@ public class StoreActivity extends Activity {
         if(deducted){
             Log.d(TAG, "Bought the autoclicker upgrade function");
 
-            // Update coins display
             updateCoinsDisplay(clicker.getTotalCoinsEarned());
 
             SharedPreferences prefs = getPreferences();
@@ -111,7 +109,7 @@ public class StoreActivity extends Activity {
             }
             clicker.upgradeClicker(StoreActivity.this);
             System.out.println("Calling the upgrade clicker function");
-            // Update coins display
+
             clicker.saveGameProgressToDB(StoreActivity.this);
         } else if (item.equals("Wings 2")) {
 
@@ -130,7 +128,7 @@ public class StoreActivity extends Activity {
             }
             clicker.upgradeClicker(StoreActivity.this);
             System.out.println("Calling the upgrade clicker function");
-            // Update coins display
+
             clicker.saveGameProgressToDB(StoreActivity.this);
         } else if (item.equals("Wings 3")) {
             if (clicker.getTotalCoinsEarned() >= cost) {
@@ -148,7 +146,7 @@ public class StoreActivity extends Activity {
             }
             clicker.upgradeClicker(StoreActivity.this);
             System.out.println("Calling the upgrade clicker function");
-            // Update coins display
+
             clicker.saveGameProgressToDB(StoreActivity.this);
         } else{
             if (clicker.getTotalCoinsEarned() >= cost) {
@@ -166,34 +164,26 @@ public class StoreActivity extends Activity {
             }
             clicker.upgradeClicker(StoreActivity.this);
             System.out.println("Calling the upgrade clicker function");
-            // Update coins display
+
             clicker.saveGameProgressToDB(StoreActivity.this);
         }
     }
 
     public void updateCoinsDisplay(int coins) {
-        // Update the TextView to show the current number of coins
         coinsTextView.setText("Coins: " + coins);
 
-        // Save the updated coin count to SharedPreferences for persistence
         SharedPreferences prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("TotalCoins", coins);
         editor.apply();
 
-        // Additionally, since your Clicker class seems to manage game state,
-        // ensure the Clicker object's totalCoinsEarned field is also updated.
-        clicker.setTotalCoinsEarned(coins); // Assuming you have this setter method
-
-        // Optionally, if you're using the Clicker object to persist data,
-        // consider saving the game state here as well.
-        clicker.saveGameProgressToDB(this); // This would save to your database or SharedPreferences, wherever your game state is managed.
+        clicker.setTotalCoinsEarned(coins);
+        clicker.saveGameProgressToDB(this);
     }
 
     private SharedPreferences getPreferences() {
         return getSharedPreferences("GamePrefs", MODE_PRIVATE);
     }
-
 
     private void saveGameProgress() {
         clicker.saveGameProgressToDB(this);

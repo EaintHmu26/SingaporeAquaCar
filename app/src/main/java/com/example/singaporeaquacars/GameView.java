@@ -42,7 +42,7 @@ public class GameView extends View {
     final int TEXT_SIZE = 60;
     SharedPreferences prefs;
     boolean showPlusOne = false;
-    float plusOneX = 0, plusOneY = 0; //position of +1
+    float plusOneX = 0, plusOneY = 0; //position of + animation
     int plusOneAlpha = 255; //fading effect
     Paint plusOnePaint;
     private OnCoinCountChangeListener coinCountChangeListener;
@@ -61,8 +61,7 @@ public class GameView extends View {
 
         storeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.store);
 
-        // Scale down the store icon
-        int iconWidth = 500; // set the width you want for the icon
+        int iconWidth = 500;
         float aspectRatio1 = (float) storeIcon.getHeight() / (float) storeIcon.getWidth();
         int iconHeight = (int) (iconWidth * aspectRatio1);
         storeIcon = Bitmap.createScaledBitmap(storeIcon, iconWidth, iconHeight, false);
@@ -85,20 +84,20 @@ public class GameView extends View {
             PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
             purpleFish.add(aPurpleFish);
         }
-        //i only want to add one shark
         Shark ashark = new Shark(context, dWidth, dHeight);
         shark.add(ashark);
         handler = new Handler(Looper.getMainLooper());
         runnable = new Runnable() {
             @Override
             public void run() {
-                invalidate(); // Triggers onDraw
-                handler.postDelayed(this, 30); // Adjust FRAME_DELAY as needed
+                invalidate();
+                handler.postDelayed(this, 30);
             }
         };
-        handler.post(runnable); // Start the drawing loop
+        // drawing loop
+        handler.post(runnable);
 
-        // Resize the car as specified
+        // car size
         float aspectRatio = (float) car.getHeight() / (float) car.getWidth();
         carWidth = 4 * dWidth / 5;
         carHeight = (int) (carWidth * aspectRatio);
@@ -120,30 +119,25 @@ public class GameView extends View {
         executorService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                //Log.d("GameView", "Updating shark speed"); // Logging for debugging
-
                 for (Shark shark : shark) {
                     // Randomly adjust the speed of each fish
-                    float newSpeed = 1 + new Random().nextFloat() * (5 - 1); // Example: speed range [1, 5]
+                    float newSpeed = 1 + new Random().nextFloat() * (5 - 1);
                     shark.setSpeed(newSpeed);
-                    //Log.d("GameView", "Fish speed updated: NewSpeed=" + newSpeed);
                 }
 
-                // Make sure to post any UI updates to the main thread
                 postInvalidate();
             }
-        }, 0, 3, TimeUnit.SECONDS); // Example: adjust every 10 seconds
+        }, 0, 3, TimeUnit.SECONDS);
     }
 
     private void updateCarImage() {
-        // Resize the car as specified
         if(car != null) { // Check to make sure the car bitmap is not null
             float aspectRatio = (float) car.getHeight() / (float) car.getWidth();
-            carWidth = 4 * dWidth / 5; // Example resizing logic, adjust as necessary
+            carWidth = 4 * dWidth / 5;
             carHeight = (int) (carWidth * aspectRatio);
             car = Bitmap.createScaledBitmap(car, carWidth, carHeight, false);
         }
-        invalidate(); // Redraw the view to reflect changes
+        invalidate();
     }
 
     private void loadPurchasedItems() {
@@ -167,20 +161,18 @@ public class GameView extends View {
             Log.d("GameView", "No car purchased, using default");
             car = BitmapFactory.decodeResource(getResources(), R.drawable.original_car);
         }
-        // Apply any necessary adjustments to the car's dimensions
         updateCarImage();
     }
 
     public void refreshPurchasedItems() {
         loadPurchasedItems();
 
-        // Resize the car as specified
         float aspectRatio = (float) car.getHeight() / (float) car.getWidth();
         carWidth = 4 * dWidth / 5;
         carHeight = (int) (carWidth * aspectRatio);
         car = Bitmap.createScaledBitmap(car, carWidth, carHeight, false);
 
-        invalidate(); // Redraw the view to reflect changes
+        invalidate(); // Redraw
     }
 
     public interface OnCoinCountChangeListener {
@@ -199,29 +191,26 @@ public class GameView extends View {
 
     public void setCoinCount(int coinCount) {
         this.coinCount = coinCount;
-        saveCoinCount(); // Save the updated coin count
-        postInvalidate(); // Redraw the view with the updated coin count
+        saveCoinCount();
+        postInvalidate();
     }
 
-    // Initialization of Fish Objects
     private void initializeFish() {
         purpleFish.clear();
         Log.d("GameView", "Initializing fish");
         for (int i = 0; i < 3; i++) {
             PurpleFish aPurpleFish = new PurpleFish(context, dWidth, dHeight);
             purpleFish.add(aPurpleFish);
-            //Log.d("GameView", "PurpleFish added");
         }
         //i just want to add one shark
         Shark ashark = new Shark(context, dWidth, dHeight);
         shark.add(ashark);
-        //Log.d("GameView", "shark added");
     }
 
     private void startPlusOneAnimation() {
-        final int animationDuration = 500; // Animation duration in milliseconds
-        final int frameRate = 30; // How often to update the animation
-        final float deltaY = -30; // How much the text moves up
+        final int animationDuration = 500;
+        final int frameRate = 30;
+        final float deltaY = -30;
         final Handler animationHandler = new Handler(Looper.getMainLooper());
         final long startTime = System.currentTimeMillis();
 
@@ -231,11 +220,10 @@ public class GameView extends View {
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 float fraction = elapsedTime / (float) animationDuration;
                 if (fraction <= 1.0) {
-                    // Update position and alpha
                     plusOneY += deltaY * fraction;
                     plusOneAlpha = 255 - (int)(255 * fraction);
                     plusOnePaint.setAlpha(plusOneAlpha);
-                    invalidate(); // Redraw to show animation progress
+                    invalidate();
                     animationHandler.postDelayed(this, frameRate);
                 } else {
                     // Animation end
@@ -250,7 +238,6 @@ public class GameView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
-        //Log.d("GameView", "onDraw called");
 
         if (scaledBg.getWidth() != getWidth() || scaledBg.getHeight() != getHeight()) {
             scaledBg = Bitmap.createScaledBitmap(home_bkgrd_platform, getWidth(), getHeight(), true);
@@ -259,17 +246,17 @@ public class GameView extends View {
         canvas.drawBitmap(scaledBg, 0, 0, null);
 
         for (PurpleFish fish : purpleFish) {
-            fish.update();  // Update position and check for looping
-            canvas.drawBitmap(fish.getBitmap(), fish.getX(), fish.getY(), null); // Draw fish
+            fish.update();
+            canvas.drawBitmap(fish.getBitmap(), fish.getX(), fish.getY(), null);
         }
         for (Shark sharks : shark) {
-            sharks.update();  // Update position and check for looping
-            canvas.drawBitmap(sharks.getBitmap(), sharks.getX(), sharks.getY(), null); // Draw fish
+            sharks.update();
+            canvas.drawBitmap(sharks.getBitmap(), sharks.getX(), sharks.getY(), null);
         }
-        invalidate(); // Keep the loop going
+        invalidate();
 
         int carX = dWidth / 2 - carWidth / 2;
-        int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07); // Adjust this factor to move the car down
+        int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07);
         canvas.drawBitmap(car, carX, carY, null);
 
         if (showPlusOne) {
@@ -277,12 +264,10 @@ public class GameView extends View {
             canvas.drawText("+" + gamePrefs.getInt("X2CoinPurchased", 1) , plusOneX, plusOneY, plusOnePaint);
         }
 
-        // Draw the store icon at a specific position, e.g., top-right corner
-        int iconX = dWidth - storeIcon.getWidth() - 30; // 50 is a margin from the right edge
-        int iconY = 30; // 50 is a margin from the top edge
+        int iconX = dWidth - storeIcon.getWidth() - 30;
+        int iconY = 30;
         canvas.drawBitmap(storeIcon, iconX, iconY, null);
 
-        // Display the coin count
         int textSize = TEXT_SIZE + 8;
 
         coinCountPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -307,26 +292,22 @@ public class GameView extends View {
             int touchX = (int) event.getX();
             int touchY = (int) event.getY();
 
-            // Check if the store icon is clicked
-            int storeIconX = dWidth - storeIcon.getWidth() - 30; // 30px margin from the right edge
-            int storeIconY = 30; // 30px margin from the top edge
+            int storeIconX = dWidth - storeIcon.getWidth() - 30;
+            int storeIconY = 30;
             int storeIconEndX = storeIconX + storeIcon.getWidth();
             int storeIconEndY = storeIconY + storeIcon.getHeight();
 
             if (touchX >= storeIconX && touchX <= storeIconEndX && touchY >= storeIconY && touchY <= storeIconEndY) {
-                // The store icon was clicked
                 openStore();
                 return true;
             }
 
-            // Calculate the car's position
             int carX = dWidth / 2 - carWidth / 2;
-            // Adjust the carY variable to match the Y position where the car image actually starts
-            int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07); // Adjust this factor to move the car down
-            // Check if the touch is within the bounds of the car image
+            int carY = (int) (dHeight / 2 - carHeight / 2 + dHeight * 0.07);
+
             if (touchX >= carX && touchX < (carX + carWidth) && touchY >= carY && touchY < (carY + carHeight)) {
                 SharedPreferences gamePrefs = context.getSharedPreferences("GamePrefs", Context.MODE_PRIVATE);
-                coinCount += gamePrefs.getInt("X2CoinPurchased", 1);//clicker.getCurrentCoinsPerClick(); // Increment coin count only if the car is touched
+                coinCount += gamePrefs.getInt("X2CoinPurchased", 1);
                 Log.d("GameView", "clicker count" + clicker.getCurrentCoinsPerClick());
                 saveCoinCount();
                 showPlusOne = true;
@@ -334,7 +315,7 @@ public class GameView extends View {
                 plusOneY = carY;
                 plusOneAlpha = 255;
                 startPlusOneAnimation();
-                invalidate(); // Redraw to show the updated coin count
+                invalidate();
                 if(coinCountChangeListener != null) {
                     coinCountChangeListener.onCoinCountChanged(coinCount);
                 }
@@ -345,11 +326,9 @@ public class GameView extends View {
 
     private void openStore() {
         if (context instanceof Activity) {
-            // Intent to start StoreActivity
             Intent intent = new Intent(context, StoreActivity.class);
             ((Activity) context).startActivityForResult(intent, REQUEST_CODE_STORE);
         } else {
-            // Handle the error condition or throw an exception
             Log.e("GameView", "Context used is not an Activity context");
         }
     }
